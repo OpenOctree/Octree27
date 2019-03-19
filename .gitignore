@@ -1,3 +1,6 @@
+# vim
+*.un~
+
 # Prerequisites
 *.d
 
