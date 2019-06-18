@@ -35,7 +35,8 @@ static const Uint EDGE_POINTS   =24;
 static const Uint FACE_POINTS   =24;
 static const Uint TOTAL_POINTS  =64;
 static const Uint PERMUTATIONS  =30;
-static const Uint MAX_ELEMENTS  =71;
+//static const Uint MAX_ELEMENTS  =71;
+static const Uint MAX_ELEMENTS  =82;
 static const Uint NUM_PATTERNS  =26;
 
 
