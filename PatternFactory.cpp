@@ -1039,7 +1039,7 @@ namespace patterns {
 		for (Uint i=0; i<SIZE; i++) {
 			if (el[i].mask == mask) {
 			   if(el[i].mask == 195 || el[i].mask == 191 || el[i].mask == 223) // DEBUG
-			      cout << "\nPattern mask: " << el[i].mask << endl; //DEBUG
+			      cout << "\nPattern mask: " << el[i].mask; //DEBUG
 				const item *it = el[i].items;
 				for(Uint j=0; j<MAX_ELEMENTS; j++) { 
 					if (it->size == 0)
