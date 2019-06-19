@@ -644,7 +644,7 @@ Uint TransitionTemplate::getNewElements(const UintVec &hex_idxs,
 
 
 
-        vector<Uint> idxs(172+12,-1);
+        vector<Uint> idxs(250,-1);
 
         for (int i = 0; i < 64; i++) {
             if(points.find(i) != points.end()){
