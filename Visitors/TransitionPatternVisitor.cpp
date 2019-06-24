@@ -56,7 +56,7 @@ namespace Clobscode
         //cout << "TransitionPatternVisitor" << endl;
         //applyTransitionPattern
         if (apply_pattern)
-        { 
+        {
             if (new_pts == NULL)
                 throw std::runtime_error(std::string("TransitionPatternVisitor: need new_pts (calling apply instead of check?)"));
             //if this octant is refined to the maximum level, return it immediately

@@ -203,6 +203,8 @@ double TransitionTemplate::getAxis(double min, double max, float val){
     return min*(1.0-val) + max*(val);
 }
 
+// tt.getNewElements(nodes,mid_nodes,*points,local_new_pts,new_eles,l_mid_nodes_v, *puntosVector, *idxsVector, true);
+// tt.getNewElements(nodes,mid_nodes,*points,*new_pts,sub_elements,l_mid_nodes_v, *puntosVector, *idxsVector, false);
 Uint TransitionTemplate::getNewElements(const UintVec &hex_idxs,
 										const UintVec & edge_idxs,
 										MeshPointVec & mesh_point,
@@ -654,18 +656,48 @@ Uint TransitionTemplate::getNewElements(const UintVec &hex_idxs,
 
         // The found pattern is returned in m_result
         for (VectorTableIt it=m_result.begin(); it != m_result.end(); ++it) {
-            // Temporay vector
+            // Temporary vector
             UintVec temp_vector;
             for (UintVecIt it1=(*it).begin() ; it1 != (*it).end(); ++it1) {
                 if(idxs[*it1] == -1){ // Se busca el Id en el vector
                     int i = 0;
                     bool flag = false;
+/**/
+                    // Debug
+                    int j = 0;
+                    bool flag2 = false;
+                    double epsilon = 1e-2;
+                    for(; j<puntosVector.size(); j++){
+                       if(puntosVector[j].DistanceTo(pt[*it1])<epsilon){
+                          flag2 = true;
+                          break;
+                       }
+                    }
+                    for(int k=0; k<mesh_point.size(); k++){//Debug
+                       if(pt[*it1].DistanceTo(mesh_point[k].getPoint())<1e-2){ //debug
+                          //flag = true;
+                          cout << "Punto duplicado en mesh_point["<<k<<"] (diff: " <<pt[*it1].DistanceTo(mesh_point[k].getPoint()) << ")" << endl;
+                          cout << "   " << mesh_point[k].getPoint().print()<<endl;
+                          cout << "   " << pt[*it1].print() << endl;
+                          break;
+                       }
+                    }
+/**/
                     for(i;i<puntosVector.size();i++){
                         if(puntosVector[i] == pt[*it1]){ // Se encuentra en el vector global
                             flag = true;
                             break;
                         }
                     }
+/**/
+                    // Debug
+                    if (flag2 && !flag){
+                       cout << "FLAGS discordia f2=True && f1=False" << endl;
+                       cout << "Puntos identicos (j="<<j<<"; ix=" << idxsVector[j] << "):"<< endl;
+                       cout << "   " << puntosVector[j].print()<<endl;
+                       cout << "   " << pt[*it1].print() << endl;
+                    }
+/**/
                     if(flag){
                         idxs[*it1] = idxsVector[i]; //Encuentra el Id en el vector global
                         tmp_pts.push_back(pt[*it1]); 
@@ -674,8 +706,8 @@ Uint TransitionTemplate::getNewElements(const UintVec &hex_idxs,
                         idxs[*it1] = mesh_point.size() + tmp_pts.size(); //Crea el Id
                         tmp_pts.push_back(pt[*it1]);
 
-                        idxsVector.push_back(idxs[*it1]); // Agrega al Idx al Vector Global
-                        puntosVector.push_back(pt[*it1]); // Agrega los puntos al Vector Global
+                        idxsVector.push_back(idxs[*it1]); // Agrega idx al Vector Global
+                        puntosVector.push_back(pt[*it1]); // Agrega el punto al Vector Global
                     }
                 }
                 temp_vector.push_back(idxs[*it1]); 

@@ -156,299 +156,268 @@ namespace Clobscode
 	//--------------------------------------------------------------------------------
     //--------------------------------------------------------------------------------
 	
-	void Mesher::generateOctreeMesh(const unsigned short &rl, TriMesh &input,
-									list<RefinementRegion *> &all_reg,
-									const string &name){
-		
-		//to save m3d files per stage
-		Clobscode::CoteMarek marek;
+   void Mesher::generateOctreeMesh(const unsigned short &rl, TriMesh &input,
+                                    list<RefinementRegion *> &all_reg,
+                                    const string &name){
 
-		//list of temp octants
-		list<Octant> tmp_octants, new_octants;
-		//list of the points added at this refinement iteration:
-		list<Point3D> new_pts;
-		
-		list<Octant>::iterator iter;
-		
-		for (unsigned long i=0; i<octants.size(); i++) {
-			tmp_octants.push_back(octants[i]);
-		}
+      //to save m3d files per stage
+      Clobscode::CoteMarek marek;
 
-        //create visitors and give them variables
-        SplitVisitor sv;
-        sv.setPoints(points);
-        sv.setEdges(octreeEdges);
-        sv.setNewPts(new_pts);
-        
-		//----------------------------------------------------------
-		//refine each octant until the Refinement Level is reached
-		//----------------------------------------------------------
-		
-		cout << "  > refining the mesh ...";
+      //list of temp octants
+      list<Octant> tmp_octants, new_octants;
+      //list of the points added at this refinement iteration:
+      list<Point3D> new_pts;
+
+      list<Octant>::iterator iter;
+
+      for (unsigned long i=0; i<octants.size(); i++) {
+         tmp_octants.push_back(octants[i]);
+      }
+
+      //create visitors and give them variables
+      SplitVisitor sv;
+      sv.setPoints(points);
+      sv.setEdges(octreeEdges);
+      sv.setNewPts(new_pts);
+
+      //----------------------------------------------------------
+      //refine each octant until the Refinement Level is reached
+      //----------------------------------------------------------
+      cout << "  > refining the mesh ...";
          cout.flush();
-      
-		for (unsigned short i=0; i<rl; i++) {
-			
-			//the new_pts is a list that holds the coordinates of
-			//new points inserted at this iteration. At the end of
-			//this bucle, they are inserted in the point vector
-			new_pts.clear();
-			
-			list<RefinementRegion *>::iterator reg_iter;
-            
-			//split the octants as needed
-			for (iter=tmp_octants.begin(); iter!=tmp_octants.end(); iter++) {
-                
-				bool to_refine = false;
-                
-                for (reg_iter=all_reg.begin(); reg_iter!=all_reg.end(); reg_iter++) {
-                    
-                    unsigned short this_rl = (*reg_iter)->getRefinementLevel();
-                    if (this_rl<i) {
-                        continue;
-                    }
-                    
-                    //If the octant has a greater RL than the region needs, continue
-                    if (this_rl<=(*iter).getRefinementLevel()) {
-                        continue;
-                    }
-                    
-                    //Get the two extreme nodes of the octant to test intersection with
-                    //this RefinementRegion. If not, conserve it as it is.
-                    //unsigned long n_idx1 = (*iter).getPoints()[0];
-                    //unsigned long n_idx2 = (*iter).getPoints()[6];
-                    
-                    if ((*reg_iter)->intersectsOctant(points,*iter)) {
-                        to_refine = true;
-                    }
-                }
-                
-                //now if refinement is not needed, we add the octant as it was.
-				if (!to_refine) {
-					new_octants.push_back(*iter);
-					continue;
-				}
-				else {
-                    list<unsigned long> inter_faces = iter->getIntersectedFaces();
 
-                    vector<vector<Point3D> > clipping_coords;
-                    sv.setClipping(clipping_coords);
+      for (unsigned short i=0; i<rl; i++) {
+         //the new_pts is a list that holds the coordinates of
+         //new points inserted at this iteration. At the end of
+         //this bucle, they are inserted in the point vector
+         new_pts.clear();
+         list<RefinementRegion *>::iterator reg_iter;
+         //split the octants as needed
+         for (iter=tmp_octants.begin(); iter!=tmp_octants.end(); iter++) {
+            bool to_refine = false;
+            for (reg_iter=all_reg.begin(); reg_iter!=all_reg.end(); reg_iter++) {
+               unsigned short this_rl = (*reg_iter)->getRefinementLevel();
+               //If the region has lower RL than the curren step.
+               if (this_rl<i) {
+                  continue;
+               }
+               //If the octant has a greater RL than the region needs, continue
+               if (this_rl<=(*iter).getRefinementLevel()) {
+                  continue;
+               }
+               //Get the two extreme nodes of the octant to test intersection with
+               //this RefinementRegion. If not, conserve it as it is.
+               //unsigned long n_idx1 = (*iter).getPoints()[0];
+               //unsigned long n_idx2 = (*iter).getPoints()[6];
+               if ((*reg_iter)->intersectsOctant(points,*iter)) {
+                  to_refine = true;
+               }
+            }
+            //now if refinement is not needed, we add the octant as it was.
+            if (!to_refine) {
+               new_octants.push_back(*iter);
+               continue;
+            }
+            else {
+               list<unsigned long> inter_faces = iter->getIntersectedFaces();
+               vector<vector<Point3D> > clipping_coords;
+               sv.setClipping(clipping_coords);
+               vector<vector<unsigned long> > split_elements;
+               sv.setNewEles(split_elements);
 
-                    vector<vector<unsigned long> > split_elements;
-                    sv.setNewEles(split_elements);
+               //iter->split(points,new_pts,octreeEdges,split_elements,clipping_coords);
+               //cout << "Accept" << endl;
+               iter->accept(&sv);
 
-                    //iter->split(points,new_pts,octreeEdges,split_elements,clipping_coords);
-                    //cout << "Accept" << endl;
-                    iter->accept(&sv);
+               if (inter_faces.empty()) {
+                  for (unsigned long j=0; j<split_elements.size(); j++) {
+                     Octant o (split_elements[j],i+1);
+                     new_octants.push_back(o);
+                  }
+               }
+               else {
+                  for (unsigned long j=0; j<split_elements.size(); j++) {
+                     Octant o (split_elements[j],i+1);
+                     //the new points are inserted in bash at the end of this
+                     //iteration. For this reason, the coordinates must be passed
+                     //"manually" at this point (clipping_coords).
 
-					if (inter_faces.empty()) {
-						for (unsigned long j=0; j<split_elements.size(); j++) {
-							Octant o (split_elements[j],i+1);
-							new_octants.push_back(o);
-						}
-					}
-					else {
-						for (unsigned long j=0; j<split_elements.size(); j++) {
-							Octant o (split_elements[j],i+1);
-							//the new points are inserted in bash at the end of this
-							//iteration. For this reason, the coordinates must be passed
-							//"manually" at this point (clipping_coords).
+                     //select_faces = true
+                     IntersectionsVisitor iv(true);
+                     //if (o.checkIntersections(input,inter_faces,clipping_coords[j]))
+                     iv.setTriMesh(input);
+                     iv.setFaces(inter_faces);
+                     iv.setCoords(clipping_coords[j]);
 
-                            //select_faces = true
-                            IntersectionsVisitor iv(true);
-                            //if (o.checkIntersections(input,inter_faces,clipping_coords[j]))
-                            iv.setTriMesh(input);
-                            iv.setFaces(inter_faces);
-                            iv.setCoords(clipping_coords[j]);
+                     if (o.accept(&iv)) {
+                        new_octants.push_back(o);
+                     }
+                     else {
+                        //The element doesn't intersect any input face.
+                        //It must be checked if it's inside or outside.
+                        //Only in the first case add it to new_octants.
+                        //Test this with parent octant faces only.
 
-                            if (o.accept(&iv)) {
-							    new_octants.push_back(o);
-							}
-							else {
-								//The element doesn't intersect any input face.
-								//It must be checked if it's inside or outside.
-								//Only in the first case add it to new_octants.
-								//Test this with parent octant faces only.
-                                
-								//Comment the following lines of this 'else' if
-								//only intersecting octants are meant to be
-								//displayed.
+                        //Comment the following lines of this 'else' if
+                        //only intersecting octants are meant to be
+                        //displayed.
 
-                                //note: inter_faces is quite enough to check if
-                                //element is inside input, no octant needed,
-                                //so i moved the method to mesher  --setriva
+                           //note: inter_faces is quite enough to check if
+                           //element is inside input, no octant needed,
+                           //so i moved the method to mesher  --setriva
 
-								if (isItIn(input,inter_faces,clipping_coords[j])) {
-									new_octants.push_back(o);
-								}
-							}
-						}
-					}
-				}
-			}
-			//remove the old octants
-			tmp_octants.clear();
-			tmp_octants = new_octants;
-			new_octants.clear();
-			
-			//if no points were added at this iteration, it is no longer
-			//necessary to continue the refinement.
-			if (new_pts.empty()) {
-				cout << "wtf!!!\n";
-				break;
-			}
-			//add the new points to the vector
-			list<Point3D>::iterator piter;
-			points.reserve(points.size() + new_pts.size());
-			for (piter=new_pts.begin(); piter!=new_pts.end(); piter++) {
-				points.push_back(MeshPoint (*piter));
-			}
-		}
-		
-        cout << " done\n";
-         
-		
-		//----------------------------------------------------------
-		//produce a one-irregular mesh
-		//----------------------------------------------------------
-		 
-		cout << "  > producing one-irregular mesh ...";
-		cout.flush();
+                        if (isItIn(input,inter_faces,clipping_coords[j])) {
+                           new_octants.push_back(o);
+                        }
+                     }
+                  }
+               }
+            }
+         }
+         //remove the old octants
+         tmp_octants.clear();
+         tmp_octants = new_octants;
+         new_octants.clear();
+         //if no points were added at this iteration, it is no longer
+         //necessary to continue the refinement.
+         if (new_pts.empty()) {
+            cout << "wtf!!!\n";
+            break;
+         }
+         //add the new points to the vector
+         list<Point3D>::iterator piter;
+         points.reserve(points.size() + new_pts.size());
+         for (piter=new_pts.begin(); piter!=new_pts.end(); piter++) {
+            points.push_back(MeshPoint (*piter));
+         }
+      }
+      cout << " done\n";
 
-		bool one_irregular = false;
-		new_octants.clear();
+      //----------------------------------------------------------
+      //produce a one-irregular mesh
+      //----------------------------------------------------------
+      cout << "  > producing one-irregular mesh ...";
+      cout.flush();
 
-        //visitante oneIrregular
-        OneIrregularVisitor oiv;
-        oiv.setEdges(octreeEdges);
-        oiv.setMaxRefLevel(rl);
+      bool one_irregular = false;
+      new_octants.clear();
 
-        //visitante TransitionPattern in check mode
-        //(we'll reuse it in apply mode later)
-        TransitionPatternVisitor tpv(false);
-        tpv.setPoints(points);
-        tpv.setEdges(octreeEdges);
-        tpv.setMaxRefLevel(rl);
-        
-        tpv.setPuntosExtras(puntosVector, idxsVector, idxsRefinados); //Contadores de puntos extras agregados por los patrones 
+      //visitante oneIrregular
+      OneIrregularVisitor oiv;
+      oiv.setEdges(octreeEdges);
+      oiv.setMaxRefLevel(rl);
+
+      //visitante TransitionPattern in check mode
+      //(we'll reuse it in apply mode later)
+      TransitionPatternVisitor tpv(false);
+      tpv.setPoints(points);
+      tpv.setEdges(octreeEdges);
+      tpv.setMaxRefLevel(rl);
+      tpv.setPuntosExtras(puntosVector, idxsVector, idxsRefinados); //Contadores de puntos extras agregados por los patrones
  
-		while (!one_irregular) {
-			one_irregular = true;
-			new_pts.clear();
-			//refine until the mesh is one-irregular
-			for (iter=tmp_octants.begin(); iter!=tmp_octants.end(); iter++) {
-				if (!(*iter).accept(&oiv) || !(*iter).accept(&tpv)) {
-					//split this octant
-					vector<vector<Point3D> > clipping_coords;
-                	sv.setClipping(clipping_coords);
-					vector< vector <unsigned long> > split_elements;
-                	sv.setNewEles(split_elements);
-					
-					list<unsigned long> inter_faces = (*iter).getIntersectedFaces();
-					
-					//(*iter).split(points,new_pts,octreeEdges,split_elements,clipping_coords);
-                	//split the octant
-                	iter->accept(&sv);
-					unsigned short prl = (*iter).getRefinementLevel();
-					//cout << "Refinement level: " << prl << endl; 
-					//insert the new elements
-					for (unsigned long j=0; j<split_elements.size(); j++) {
-						Octant o (split_elements[j],prl+1);
-						
-						if (inter_faces.empty()) {
-							new_octants.push_back(o);
-							continue;
-						}
-                        //select_faces = true
-                        IntersectionsVisitor iv(true);
-                        //if (o.checkIntersections(input,inter_faces,clipping_coords[j]))
-                        iv.setTriMesh(input);
-                        iv.setFaces(inter_faces);
-                        iv.setCoords(clipping_coords[j]);
+      while (!one_irregular) {
+         one_irregular = true;
+         new_pts.clear();
+         //refine until the mesh is one-irregular
+         for (iter=tmp_octants.begin(); iter!=tmp_octants.end(); iter++) {
+            if (!(*iter).accept(&oiv) || !(*iter).accept(&tpv)) {
+               //split this octant
+               vector<vector<Point3D> > clipping_coords;
+               sv.setClipping(clipping_coords);
+               vector< vector <unsigned long> > split_elements;
+               sv.setNewEles(split_elements);
+               list<unsigned long> inter_faces = (*iter).getIntersectedFaces();
+               //(*iter).split(points,new_pts,octreeEdges,split_elements,clipping_coords);
+               //split the octant
+               iter->accept(&sv);
+               unsigned short prl = (*iter).getRefinementLevel();
+               //cout << "Refinement level: " << prl << endl;
+               //insert the new elements
+               for (unsigned long j=0; j<split_elements.size(); j++) {
+                  Octant o (split_elements[j],prl+1);
+                  if (inter_faces.empty()) {
+                     new_octants.push_back(o);
+                     continue;
+                  }
+                  //select_faces = true
+                  IntersectionsVisitor iv(true);
+                  //if (o.checkIntersections(input,inter_faces,clipping_coords[j]))
+                  iv.setTriMesh(input);
+                  iv.setFaces(inter_faces);
+                  iv.setCoords(clipping_coords[j]);
+                  if (o.accept(&iv)) {
+                     new_octants.push_back(o);
+                  } else {
+                     if (isItIn(input,inter_faces,clipping_coords[j])) {
+                        new_octants.push_back(o);
+                     }
+                  }
+               }
+               one_irregular = false;
+            }
+            else {
+               new_octants.push_back(*iter);
+            }
+         }
 
-                        if (o.accept(&iv)) {
-                        	new_octants.push_back(o);
-						}
-						else {
-							if (isItIn(input,inter_faces,clipping_coords[j])) {
-								new_octants.push_back(o);
-							}
-						}
-					}
-					one_irregular = false;
-				}
-				else {
-					new_octants.push_back(*iter);
-				}
-			}
-			
-			if (one_irregular) {
-				break;
-			}
-			
-			//remove the old octants
-			tmp_octants.clear();
-			tmp_octants = new_octants;
-			new_octants.clear();
-			
-			//if no points were added at this iteration, it is no longer
-			//necessary to continue the refinement.
-			if (new_pts.empty()) {
-				break;
-			}
-			//add the new points to the vector
-			list<Point3D>::iterator piter;
-			points.reserve(points.size() + new_pts.size());
-			for (piter=new_pts.begin(); piter!=new_pts.end(); piter++) {
-				points.push_back(MeshPoint (*piter));
-			}
-		}
-		//----------------------------------------------------------
-		// apply transition patterns
-		//----------------------------------------------------------
+         if (one_irregular) {
+            break;
+         }
+         //remove the old octants
+         tmp_octants.clear();
+         tmp_octants = new_octants;
+         new_octants.clear();
+         //if no points were added at this iteration, it is no longer
+         //necessary to continue the refinement.
+         if (new_pts.empty()) {
+            break;
+         }
+         //add the new points to the vector
+         list<Point3D>::iterator piter;
+         points.reserve(points.size() + new_pts.size());
+         for (piter=new_pts.begin(); piter!=new_pts.end(); piter++) {
+            points.push_back(MeshPoint (*piter));
+         }
+      }
 
-		cout << " done\n  > applying transition patterns ...";
-		cout.flush();
-		 
-		
-		//clean tmp point list
-		new_pts.clear();
-		//new_octants.clear();
+      //----------------------------------------------------------
+      // apply transition patterns
+      //----------------------------------------------------------
+      cout << " done\n  > applying transition patterns ...";
+      cout.flush();
 
-		//change TransitionPatternVisitor mode to apply pattern
-		
-        tpv.setApplyMode(true);
-        tpv.setNewPoints(new_pts);
-		for (iter = tmp_octants.begin(); iter!=tmp_octants.end(); iter++) {
-			//vector<vector <unsigned long> > trs_ele;
-            //if (!(*iter).applyTransitionPattern(points,new_pts,octreeEdges,rl)) {
-            if (!(*iter).accept(&tpv)) {
-                std::cerr << "Error at Mesher::generateOctreeMesh";
-                std::cerr << " Transition Pattern not found\n";
-			}
-		}
-		
-		//if no points were added at this iteration, it is no longer
-		//necessary to continue the refinement.
-		if (!new_pts.empty()) {
-			//add the new points to the vector
-			list<Point3D>::iterator piter;
-			points.reserve(points.size() + new_pts.size());
-			for (piter=new_pts.begin(); piter!=new_pts.end(); piter++) {
-				points.push_back(MeshPoint (*piter));
-			}
-		}
-        
-		//put the octants in a vector
-		octants.clear();
-		octants.reserve(tmp_octants.size());
-		for (iter=tmp_octants.begin(); iter!=tmp_octants.end(); iter++) {
-			octants.push_back(*iter);
-		}
-		
-		//cout << " done\n";
+      //clean tmp point list
+      new_pts.clear();
+      //new_octants.clear();
 
-	}
+      //change TransitionPatternVisitor mode to apply pattern
+      tpv.setApplyMode(true);
+      tpv.setNewPoints(new_pts);
+      for (iter = tmp_octants.begin(); iter!=tmp_octants.end(); iter++) {
+         //vector<vector <unsigned long> > trs_ele;
+         //if (!(*iter).applyTransitionPattern(points,new_pts,octreeEdges,rl)) {
+         if (!(*iter).accept(&tpv)) {
+            std::cerr << "Error at Mesher::generateOctreeMesh";
+            std::cerr << " Transition Pattern not found\n";
+         }
+      }
+      //
+      if (!new_pts.empty()) {
+         //add the new points to the vector
+         list<Point3D>::iterator piter;
+         points.reserve(points.size() + new_pts.size());
+         for (piter=new_pts.begin(); piter!=new_pts.end(); piter++) {
+            points.push_back(MeshPoint (*piter));
+         }
+      }
+      //put the octants in a vector
+      octants.clear();
+      octants.reserve(tmp_octants.size());
+      for (iter=tmp_octants.begin(); iter!=tmp_octants.end(); iter++) {
+         octants.push_back(*iter);
+      }
+      cout << " done\n";
+   }
 
     bool Mesher::isItIn(TriMesh &mesh, list<unsigned long> &faces, vector<Point3D> &coords) {
         //this method is meant to be used by octants that don't
