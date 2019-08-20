@@ -2,6 +2,14 @@
 #include "Mesher.h"
 #include <math.h>
 
+/** /
+//debug
+#include <iostream>
+#include <iterator>
+#include <vector>
+#include <algorithm>
+/**/
+
 namespace Clobscode
 {
 	//--------------------------------------------------------------------------------
@@ -269,6 +277,16 @@ namespace Clobscode
                         if (isItIn(input,inter_faces,clipping_coords[j])) {
                            new_octants.push_back(o);
                         }
+/** /
+                        //DEBUG Descomentar para que no elimine octante
+                        else{
+                           cout << "\nelimina octante [1]: {";
+                           vector<unsigned long> pix = o.getPoints();
+                           std::copy(pix.begin(), pix.end(), std::ostream_iterator<unsigned long>(std::cout, ", "));
+                           cout << "}" << endl;
+                           new_octants.push_back(o);
+                        }
+/**/
                      }
                   }
                }
@@ -351,6 +369,16 @@ namespace Clobscode
                      if (isItIn(input,inter_faces,clipping_coords[j])) {
                         new_octants.push_back(o);
                      }
+/** /
+                     //DEBUG Descomentar para que no elimine octante
+                     else{
+                        cout << "\nelimina octante [2]: {";
+                        vector<unsigned long> pix = o.getPoints();
+                        std::copy(pix.begin(), pix.end(), std::ostream_iterator<unsigned long>(std::cout, ", "));
+                        cout << "}" << endl;
+                        new_octants.push_back(o);
+                     }
+/**/
                   }
                }
                one_irregular = false;
@@ -419,15 +447,21 @@ namespace Clobscode
       cout << " done\n";
    }
 
-    bool Mesher::isItIn(TriMesh &mesh, list<unsigned long> &faces, vector<Point3D> &coords) {
+   bool Mesher::isItIn(TriMesh &mesh, list<unsigned long> &faces, vector<Point3D> &coords) {
         //this method is meant to be used by octants that don't
         //intersect input domains. If they are inside of at least
         //one input mesh, then they must remain in the output mesh.
         bool first = mesh.pointIsInMesh(coords[0],faces);
         bool second = mesh.pointIsInMesh(coords[1],faces);
+/**/
         if (first==second) {
             return first;
         }
+/** /
+        if (first || second){
+           return true;
+        }
+/**/
 
         //cout << "one incosistency detected -> hard test\n";
         //return mesh.pointIsInMesh(coords[0],faces);

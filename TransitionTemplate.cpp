@@ -174,7 +174,8 @@ bool TransitionTemplate::findPattern() {
 
     // Just for debugging
     //cout << "PATRON NO ENCONTRADO " << m_cube->reportRotation() << endl;
-
+    cout << "\n**No-Pattern report: " << m_cube->reportRotation(); //DEBUG
+    cout << "\nPattern no encontrado: " << m_cube->getEdgeTransitionPointsMask(); //DEBUG
     return false;
 }
 
@@ -662,8 +663,8 @@ Uint TransitionTemplate::getNewElements(const UintVec &hex_idxs,
                 if(idxs[*it1] == -1){ // Se busca el Id en el vector
                     int i = 0;
                     bool flag = false;
-/**/
-                    // Debug
+
+                    /** / // Debug
                     int j = 0;
                     bool flag2 = false;
                     double epsilon = 1e-2;
@@ -682,22 +683,24 @@ Uint TransitionTemplate::getNewElements(const UintVec &hex_idxs,
                           break;
                        }
                     }
-/**/
+                    /**/
+
                     for(i;i<puntosVector.size();i++){
                         if(puntosVector[i] == pt[*it1]){ // Se encuentra en el vector global
                             flag = true;
                             break;
                         }
                     }
-/**/
-                    // Debug
+
+                    /** / // Debug
                     if (flag2 && !flag){
                        cout << "FLAGS discordia f2=True && f1=False" << endl;
                        cout << "Puntos identicos (j="<<j<<"; ix=" << idxsVector[j] << "):"<< endl;
                        cout << "   " << puntosVector[j].print()<<endl;
                        cout << "   " << pt[*it1].print() << endl;
                     }
-/**/
+                    /**/
+
                     if(flag){
                         idxs[*it1] = idxsVector[i]; //Encuentra el Id en el vector global
                         tmp_pts.push_back(pt[*it1]); 
