@@ -175,7 +175,7 @@ bool TransitionTemplate::findPattern() {
     // Just for debugging
     //cout << "PATRON NO ENCONTRADO " << m_cube->reportRotation() << endl;
     cout << "\n**No-Pattern report: " << m_cube->reportRotation(); //DEBUG
-    cout << "\nPattern no encontrado: " << m_cube->getEdgeTransitionPointsMask(); //DEBUG
+    //cout << "\nPattern no encontrado: " << m_cube->getEdgeTransitionPointsMask(); //DEBUG
     return false;
 }
 

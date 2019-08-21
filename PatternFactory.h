@@ -49,10 +49,26 @@ public:
         Uint points[CORNER_POINTS];
     };
 
+/* OLD * /
     // Struct contains one element and the mask its edge point associated.
     struct Element {
         Uint mask;
         item items[MAX_ELEMENTS];
+    };
+/* /OLD */
+
+    /// NEW; templates definition (T2, T3, T4, T40, etc...)
+    struct Template_st{
+       Uint id; // necessary?
+       item items[MAX_ELEMENTS];
+    };
+
+    /// NEW; Pattern table entry (pattern -> template)
+    struct PatternTemplateMap{ // TODO encontrar mejor nombre =P
+       /// pattern mask (same as mask of Element struct)
+       Uint mask;
+       /// Index of template (In array of templates def.)
+       Uint template_ix; // or use? Uint template_id; ??
     };
 
     static PatternFactory *instance();
@@ -69,7 +85,9 @@ private:
     PatternFactory(const PatternFactory &) { };
     PatternFactory& operator=(PatternFactory const&){ return *this; };
 
-    static const Element elements[];
+    //static const Element elements[]; //OLD
+    static const Template_st templates[];
+    static const PatternTemplateMap pattern_table[];
 
     static PatternFactory* m_Instance;
     static int m_NumInstances;

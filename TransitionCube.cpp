@@ -36,7 +36,7 @@ namespace patterns {
 		15, 25, 17, 7,10, 12, 22,14,
 		4,  16, 13*/
 	};
-	
+
 	const Uint TransitionCube::InternalToExternal[TOTAL_POINTS] = {
 		0, 10, 11, 3, 
 		24, 44, 46, 28,
@@ -58,14 +58,13 @@ namespace patterns {
 		8, 20, 10, 21, 26, 23, 16, 25,18,
 		1,  9, 2,  13, 22, 14,  5, 17, 6*/
 	};
-	
-	
+
 	TransitionCube::TransitionCube(const set<unsigned long>& flag_hex_idxs): m_mask(0) { 
 		//Default eight corner point.
 		this->flag_hex_idxs = flag_hex_idxs;
 		addCornerTransitionPointsMap(); 
 	}
-	
+
 	TransitionCube::TransitionCube(const vector<Uint>& edges, const set<unsigned long>& flag_hex_idxs): m_mask(0) {
 		this->flag_hex_idxs = flag_hex_idxs;
 		if (edges.size() > 0) {        
@@ -84,25 +83,25 @@ namespace patterns {
 		//Insert eight default corner points into the map.
 		addCornerTransitionPointsMap();
 	}
-	
+
 	void TransitionCube::resetTransitionCube() {
 		m_MapVertices.clear();
 		addCornerTransitionPointsMap();
 		addEdgeTransitionPointsMap();
 	}
-	
+
 	void TransitionCube::addNewTransitionPoint(int point) {
 		TransitionPoint tmpPoint = TransitionPoint(point);
 		
 		if (m_MapVertices.find(tmpPoint.getInitTransitionPoint()) == m_MapVertices.end())
 			m_MapVertices.insert(std::make_pair(tmpPoint.getInitTransitionPoint(), tmpPoint));
 	}
-	
+
 	void TransitionCube::deleteTransitionPoint(int point)
 	{
 		m_MapVertices.erase (m_MapVertices.find(point));
 	}
-	
+
 	void TransitionCube::rotate(int axis, int rot) {
 		
 		if ((axis > -1) && (axis < 3)) {
@@ -160,19 +159,19 @@ namespace patterns {
 				m_mask = mask;
 		}
 	}
-	
+
 	void TransitionCube::rotX(int rotation) {
 		this->rotate(0,rotation);
 	}
-	
+
 	void TransitionCube::rotY(int rotation) {
 		this->rotate(1,rotation);
 	}
-	
+
 	void TransitionCube::rotZ(int rotation) {
 		this->rotate(2,rotation);
 	}
-	
+
 	void TransitionCube::getInitTransitionPoints(vector<Uint> & nodes) {
 		nodes.clear();
 		
@@ -182,8 +181,7 @@ namespace patterns {
 			nodes.push_back( InternalToExternal[(*it).first] );
 		}
 	}
-	
-	
+
 	void TransitionCube::getCurrentTransitionPoints(vector<Uint> & nodes) {
 		nodes.clear();
 		
@@ -193,7 +191,7 @@ namespace patterns {
 			nodes.push_back( InternalToExternal[(*it).second.getRotatedTransitionPoint()] );
 		}
 	}
-	
+
 	void TransitionCube::getCurrentTransitionPoints(map<Uint, Uint> & nodes) {
 		nodes.clear();
 		
@@ -204,9 +202,7 @@ namespace patterns {
 									InternalToExternal[(*it).second.getInitTransitionPoint()]));
 		}
 	}
-	
-	
-	
+
 	void TransitionCube::getEdgeTransitionPoints(vector<Uint> & edges) {
 		
 		if (m_rotated_edges.empty()) {
@@ -219,7 +215,7 @@ namespace patterns {
 		}
 		
 	}
-	
+
 	void TransitionCube::addCornerTransitionPointsMap() {
 		
 		// Map of defaultvertices.
@@ -233,7 +229,7 @@ namespace patterns {
 		m_MapVertices.insert(std::make_pair(15, TransitionPoint(3,3,0)));/// 8
 		
 	}
-	
+
 	void TransitionCube::addEdgeTransitionPointsMap() {
 		if ( m_edges.size() > 0 ) {
 			
@@ -244,7 +240,7 @@ namespace patterns {
 		}
 		
 	}
-	
+
 	int TransitionCube::getRotationSteps(int rotation) {
 		int step = 0;
 		
@@ -259,17 +255,17 @@ namespace patterns {
 		
 		return step;
 	}
-	
-	
+
 	string TransitionCube::reportRotation() {
 		stringstream report ;
+		Uint mask = 0;
 		
 		report << "|SIZE: "<< m_edges.size() << " NODES:";
-		Uint mask = 0;
 		
 		for (vector<Uint>::iterator it = m_edges.begin(); it != m_edges.end(); ++it){
 			report << " " << InternalToExternal[(*it)];
 			mask |=1UL<<InternalToExternal[(*it)];
+
 		}
 		
 		for (PointMapIter it  = m_MapVertices.begin(); 
@@ -278,10 +274,8 @@ namespace patterns {
 			report << "| " << InternalToExternal[(*it).second.getInitTransitionPoint()] << 
             "-->" << InternalToExternal[(*it).second.getRotatedTransitionPoint()] ;
 		}
+
 		report << " Mask:" << mask;
 		return report.str();
 	}
-	
-	
-	
 }
