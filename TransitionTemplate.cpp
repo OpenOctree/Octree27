@@ -5,6 +5,9 @@
  *      Author: jsepulve
  */
 
+//debug
+//#include <fstream>
+
 #include "TransitionTemplate.h"
 
 using namespace std;
@@ -173,8 +176,7 @@ bool TransitionTemplate::findPattern() {
     }
 
     // Just for debugging
-    //cout << "PATRON NO ENCONTRADO " << m_cube->reportRotation() << endl;
-    cout << "\n**No-Pattern report: " << m_cube->reportRotation(); //DEBUG
+    //cout << "\n**No-Pattern report: " << m_cube->reportRotation(); //DEBUG
     //cout << "\nPattern no encontrado: " << m_cube->getEdgeTransitionPointsMask(); //DEBUG
     return false;
 }
@@ -240,7 +242,6 @@ Uint TransitionTemplate::getNewElements(const UintVec &hex_idxs,
             return ma;
         }
         
-        
         UintMap points;
         // Returns a map of (rotated,init point)
         m_cube->getCurrentTransitionPoints(points);
@@ -255,7 +256,7 @@ Uint TransitionTemplate::getNewElements(const UintVec &hex_idxs,
         Point3D p6 = mesh_point[hex_idxs[points.find(6)->second]].getPoint();
         Point3D p7 = mesh_point[hex_idxs[points.find(7)->second]].getPoint();
 
-        vector<Point3D> pt(250); //12 ptos nuevos por T40 y 66 ptos por T7
+        vector<Point3D> pt(300); //12 ptos nuevos por T40 y 66 ptos por T7
         pt.clear();
 
         pt[0] = p0;
@@ -645,9 +646,124 @@ Uint TransitionTemplate::getNewElements(const UintVec &hex_idxs,
         pt[248] = aux17 + ((aux1-aux17)*(2.0/3.0));
         pt[249] = aux18 + ((aux2-aux18)*(2.0/3.0));
 
+        // T5a
+        Point3D tmp_10;
+        Point3D tmp_01;
+        Point3D auxf23;
+        Point3D tmp_18;
+        Point3D auxf19;
+        Point3D tmp_12;
+        Point3D auxf24;
+        Point3D tmp_09;
+        Point3D tmp_02;
+        Point3D auxf20;
+        Point3D tmp_11;
+        Point3D tmp_17;
+        //Limites (caras exterior y caras "interior")
+        //Cara {0 1 5 4}
+        aux1 = pt[40] + ((pt[42]-pt[40])*(1.0/3.0));
+        aux2 = pt[40] + ((pt[42]-pt[40])*(2.0/3.0));
+        pt[250] = pt[8] + ((aux1-pt[8])*(2.0/3.0));
+        pt[251] = pt[9] + ((aux2-pt[9])*(2.0/3.0));
+        tmp_01 = pt[8] + ((aux1-pt[8])*(1.0/3.0));
+        tmp_02 = pt[9] + ((aux2-pt[9])*(1.0/3.0));
+        aux1 = pt[40] + ((pt[41]-pt[40])*(1.0/3.0));
+        aux2 = pt[40] + ((pt[41]-pt[40])*(2.0/3.0));
+        pt[252] = pt[24] + ((aux1-pt[24])*(2.0/3.0));
+        pt[253] = pt[25] + ((aux2-pt[25])*(2.0/3.0));
+        //Cara {0 3 7 4}
+        aux1 = pt[44] + ((pt[46]-pt[44])*(1.0/3.0));
+        aux2 = pt[44] + ((pt[46]-pt[44])*(2.0/3.0));
+        pt[254] = pt[10] + ((aux1-pt[10])*(2.0/3.0));
+        pt[255] = pt[11] + ((aux2-pt[11])*(2.0/3.0));
+        aux1 = pt[44] + ((pt[45]-pt[44])*(1.0/3.0));
+        aux2 = pt[44] + ((pt[45]-pt[44])*(2.0/3.0));
+        pt[256] = pt[24] + ((aux1-pt[24])*(2.0/3.0));
+        pt[257] = pt[25] + ((aux2-pt[25])*(2.0/3.0));
+        //Cara {0 1 57 56}
+        aux1 = pt[56] + ((pt[57]-pt[56])*(1.0/3.0));
+        aux2 = pt[56] + ((pt[57]-pt[56])*(2.0/3.0));
+        pt[258] = pt[8] + ((aux1-pt[8])*(2.0/3.0));
+        pt[259] = pt[9] + ((aux2-pt[9])*(2.0/3.0));
+        tmp_09 = pt[8] + ((aux1-pt[8])*(1.0/3.0));
+        tmp_10 = pt[9] + ((aux2-pt[9])*(1.0/3.0));
+        //Cara {56 58 3 0}
+        aux1 = pt[56] + ((pt[58]-pt[56])*(1.0/3.0));
+        aux2 = pt[56] + ((pt[58]-pt[56])*(2.0/3.0));
+        pt[260] = pt[10] + ((aux1-pt[10])*(2.0/3.0));
+        pt[261] = pt[11] + ((aux2-pt[11])*(2.0/3.0));
+        tmp_11 = pt[10] + ((aux1-pt[10])*(1.0/3.0));
+        tmp_12 = pt[11] + ((aux2-pt[11])*(1.0/3.0));
+        //Cara {1 2 59 57}
+        aux1 = pt[57] + ((pt[59]-pt[57])*(1.0/3.0));
+        aux2 = pt[57] + ((pt[59]-pt[57])*(2.0/3.0));
+        pt[262] = pt[12] + ((aux1-pt[12])*(2.0/3.0));
+        pt[263] = pt[13] + ((aux2-pt[13])*(2.0/3.0));
+        //Cara {58 59 2 3}
+        aux1 = pt[58] + ((pt[59]-pt[58])*(1.0/3.0));
+        aux2 = pt[58] + ((pt[59]-pt[58])*(2.0/3.0));
+        pt[264] = pt[14] + ((aux1-pt[14])*(2.0/3.0));
+        pt[265] = pt[15] + ((aux2-pt[15])*(2.0/3.0));
+        //Cara {0 56 60 4} //vertical
+        aux1 = pt[56] + ((pt[60]-pt[56])*(1.0/3.0));
+        aux2 = pt[56] + ((pt[60]-pt[56])*(2.0/3.0));
+        pt[266] = pt[24] + ((aux1-pt[24])*(2.0/3.0));
+        pt[267] = pt[25] + ((aux2-pt[25])*(2.0/3.0));
+        tmp_17 = pt[24] + ((aux1-pt[24])*(1.0/3.0));
+        tmp_18 = pt[25] + ((aux2-pt[25])*(1.0/3.0));
+        //Hexa_1 {0 1 2 3 56 57 59 58}
+        pt[268] = pt[32] + ((pt[56]-pt[32])*(1.0/3.0));
+        pt[269] = pt[33] + ((pt[57]-pt[33])*(1.0/3.0));
+        pt[270] = pt[34] + ((pt[58]-pt[34])*(1.0/3.0));
+        pt[271] = pt[35] + ((pt[59]-pt[35])*(1.0/3.0));
+        //Hexa_2 {60 61 63 62 4 5 6 7}
+        // Empty
+        //Hexa_3 {0 1 57 56 4 5 61 60}
+        aux1 = pt[1] + ((pt[57]-pt[1])*(2.0/3.0));
+        aux2 = pt[5] + ((pt[61]-pt[5])*(2.0/3.0));
+        auxf19 = aux1 + ((aux2-aux1)*(1.0/3.0));
+        auxf20 = aux1 + ((aux2-aux1)*(2.0/3.0));
+        pt[272] = pt[266] + ((auxf19-pt[266])*(1.0/3.0));
+        pt[273] = pt[266] + ((auxf19-pt[266])*(2.0/3.0));
+        pt[274] = pt[267] + ((auxf20-pt[267])*(1.0/3.0));
+        pt[275] = pt[267] + ((auxf20-pt[267])*(2.0/3.0));
+        aux1 = pt[272] + ((pt[273]-pt[272])*(1.0/3.0));
+        aux2 = pt[272] + ((pt[273]-pt[272])*(2.0/3.0));
+        pt[276] = tmp_09 + ((aux1-tmp_09)*(2.0/3.0));
+        pt[277] = tmp_10 + ((aux2-tmp_10)*(2.0/3.0));
+        aux1 = pt[272] + ((pt[274]-pt[272])*(1.0/3.0));
+        aux2 = pt[272] + ((pt[274]-pt[272])*(2.0/3.0));
+        pt[278] = tmp_17 + ((aux1-tmp_17)*(2.0/3.0));
+        pt[279] = tmp_18 + ((aux2-tmp_18)*(2.0/3.0));
+        //Hexa_4 {1 2 59 57 5 6 63 61}
+        aux1 = pt[61] + ((pt[63]-pt[61])*(1.0/3.0));
+        aux2 = pt[61] + ((pt[63]-pt[61])*(2.0/3.0));
+        pt[280] = pt[49] + ((aux1-pt[49])*(2.0/3.0));
+        pt[281] = pt[51] + ((aux2-pt[51])*(2.0/3.0));
+        //Hexa_5 {2 3 58 59 6 7 62 63}
+        aux1 = pt[62] + ((pt[63]-pt[62])*(1.0/3.0));
+        aux2 = pt[62] + ((pt[63]-pt[62])*(2.0/3.0));
+        pt[282] = pt[53] + ((aux1-pt[53])*(2.0/3.0));
+        pt[283] = pt[55] + ((aux2-pt[55])*(2.0/3.0));
+        //Hexa_6 {56 58 3 0 60 62 7 4}
+        aux1 = pt[3] + ((pt[58]-pt[3])*(2.0/3.0));
+        aux2 = pt[7] + ((pt[62]-pt[7])*(2.0/3.0));
+        auxf23 = aux1 + ((aux2-aux1)*(1.0/3.0));
+        auxf24 = aux1 + ((aux2-aux1)*(2.0/3.0));
+        pt[284] = pt[266] + ((auxf23-pt[266])*(1.0/3.0));
+        pt[285] = pt[266] + ((auxf23-pt[266])*(2.0/3.0));
+        pt[286] = pt[267] + ((auxf24-pt[267])*(1.0/3.0));
+        pt[287] = pt[267] + ((auxf24-pt[267])*(2.0/3.0));
+        aux1 = pt[284] + ((pt[285]-pt[284])*(1.0/3.0));
+        aux2 = pt[284] + ((pt[285]-pt[284])*(2.0/3.0));
+        pt[288] = tmp_11 + ((aux1-tmp_11)*(2.0/3.0));
+        pt[289] = tmp_12 + ((aux2-tmp_12)*(2.0/3.0));
+        aux1 = pt[284] + ((pt[286]-pt[284])*(1.0/3.0));
+        aux2 = pt[284] + ((pt[286]-pt[284])*(2.0/3.0));
+        pt[290] = tmp_17 + ((aux1-tmp_17)*(2.0/3.0));
+        pt[291] = tmp_18 + ((aux2-tmp_18)*(2.0/3.0));
 
-
-        vector<Uint> idxs(250,-1);
+        vector<Uint> idxs(292,-1);
 
         for (int i = 0; i < 64; i++) {
             if(points.find(i) != points.end()){
@@ -655,6 +771,27 @@ Uint TransitionTemplate::getNewElements(const UintVec &hex_idxs,
             }
         }
 
+        /* //DEBUG * /
+        if(m_cube->getEdgeTransitionPointsMask() == 31){
+           ofstream mf;
+           stringstream ss;
+           ss << "0_" << mesh_point.size() + tmp_pts.size() <<"_pt_out.txt";
+           mf.open (ss.str());
+           for (int i = 0; i < 292; i++)
+             mf << pt[i] << '\n';
+           mf.close();
+           ss.str("");
+           ss << "0_" << mesh_point.size() + tmp_pts.size() <<"_mresult_out.txt";
+           mf.open (ss.str());
+           for (auto ele: m_result){
+              mf << "{";
+              for (auto p: ele)
+                 mf << p << ' ';
+              mf << "}\n";
+           }
+           mf.close();
+        }
+        /**/
         // The found pattern is returned in m_result
         for (VectorTableIt it=m_result.begin(); it != m_result.end(); ++it) {
             // Temporary vector
@@ -664,42 +801,12 @@ Uint TransitionTemplate::getNewElements(const UintVec &hex_idxs,
                     int i = 0;
                     bool flag = false;
 
-                    /** / // Debug
-                    int j = 0;
-                    bool flag2 = false;
-                    double epsilon = 1e-2;
-                    for(; j<puntosVector.size(); j++){
-                       if(puntosVector[j].DistanceTo(pt[*it1])<epsilon){
-                          flag2 = true;
-                          break;
-                       }
-                    }
-                    for(int k=0; k<mesh_point.size(); k++){//Debug
-                       if(pt[*it1].DistanceTo(mesh_point[k].getPoint())<1e-2){ //debug
-                          //flag = true;
-                          cout << "Punto duplicado en mesh_point["<<k<<"] (diff: " <<pt[*it1].DistanceTo(mesh_point[k].getPoint()) << ")" << endl;
-                          cout << "   " << mesh_point[k].getPoint().print()<<endl;
-                          cout << "   " << pt[*it1].print() << endl;
-                          break;
-                       }
-                    }
-                    /**/
-
                     for(i;i<puntosVector.size();i++){
                         if(puntosVector[i] == pt[*it1]){ // Se encuentra en el vector global
                             flag = true;
                             break;
                         }
                     }
-
-                    /** / // Debug
-                    if (flag2 && !flag){
-                       cout << "FLAGS discordia f2=True && f1=False" << endl;
-                       cout << "Puntos identicos (j="<<j<<"; ix=" << idxsVector[j] << "):"<< endl;
-                       cout << "   " << puntosVector[j].print()<<endl;
-                       cout << "   " << pt[*it1].print() << endl;
-                    }
-                    /**/
 
                     if(flag){
                         idxs[*it1] = idxsVector[i]; //Encuentra el Id en el vector global
