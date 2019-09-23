@@ -369,16 +369,6 @@ namespace Clobscode
                      if (isItIn(input,inter_faces,clipping_coords[j])) {
                         new_octants.push_back(o);
                      }
-/** /
-                     //DEBUG Descomentar para que no elimine octante
-                     else{
-                        cout << "\nelimina octante [2]: {";
-                        vector<unsigned long> pix = o.getPoints();
-                        std::copy(pix.begin(), pix.end(), std::ostream_iterator<unsigned long>(std::cout, ", "));
-                        cout << "}" << endl;
-                        new_octants.push_back(o);
-                     }
-/**/
                   }
                }
                one_irregular = false;

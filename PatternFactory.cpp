@@ -32,11 +32,11 @@ namespace patterns {
 	const PatternFactory::PatternTemplateMap PatternFactory::pattern_table[] = {
 	   // T2
       {9, 1},      // 2A --> T2   [ 0 3 ]
-      {73, 0},     // 3B --> T2   [ 0 3 6 ]
+      //{73, 1},     // 3B --> T2   [ 0 3 6 ]
       // T3
       {11, 2},     // 3A --> T3   [ 0 1 3 ]
-      {10, 0},     // 2B --> T3   [ 1 3 ]
-      {75, 0},     // 4D --> T3   [ 0 1 3 6 ]
+      //{10, 2},     // 2B --> T3   [ 1 3 ]
+      //{75, 2},     // 4D --> T3   [ 0 1 3 6 ]
       // T4
       {15, 3},     // 4A --> T4   [ 0 1 3 2 ]
       // T40
@@ -47,22 +47,23 @@ namespace patterns {
       {139, 6},    // 4C --> T4C  [0 1 3 7]
       // T4C.b
       {29, 7},     // 4Cb--> T4Cb [0 2 3 4]
+      {43, 7},     // 4Cb--> T4Cb [0 1 3 5]
       // T5A
       {31, 8},     // 5A --> T5A  [ 0 1 2 3 4 ]
       // T6
       {221, 9},    // 6A --> T6   [ 0 3 2 4 7 6 ]
-      {40, 0},     // 2C --> T6   [ 3 5 ]0
-      {88, 0},     // 3C --> T6   [ 3 4 6 ]
-      {93, 0},     // 5B --> T6   [ 0 3 2 4 6 ]
+      //{40, 9},     // 2C --> T6   [ 3 5 ]0
+      //{88, 9},     // 3C --> T6   [ 3 4 6 ]
+      //{93, 9},     // 5B --> T6   [ 0 3 2 4 6 ]
       // T6B
       {95, 10},     // 6B --> T6B  [0 1 2 3 4 6]
       // T7
       {191, 11},   //  7 --> T7   [ 0 1 2 3 4 5 7 ]
 /* remove_T8 */
       // T8
-      {90, 0},     // 4F --> T8   [ 1 3 4 6 ]
-      {173, 0},    // 5C --> T8   [ 0 3 2 5 7 ]
-      {235, 0},    // 6C --> T8   [ 0 1 3 5 7 6 ]
+      //{90, 12},     // 4F --> T8   [ 1 3 4 6 ]
+      //{173, 12},    // 5C --> T8   [ 0 3 2 5 7 ]
+      //{235, 12},    // 6C --> T8   [ 0 1 3 5 7 6 ]
       //{255, 12},   //  8 --> T8   [ 0 1 2 3 4 5 6 7 ]
 /* /remove_T8 */
 	};
@@ -120,7 +121,6 @@ namespace patterns {
             {HEXA_POINTS, {11,34,14,3,47,58,53,7}},
             {HEXA_POINTS, {34,35,15,14,58,59,55,53}},
             {HEXA_POINTS, {35,13,2,15,59,51,6,55}}
-
          }
       },
       { // T40
@@ -163,7 +163,6 @@ namespace patterns {
             {HEXA_POINTS, {59, 57, 1, 2, 63, 61, 5, 6}},
             {HEXA_POINTS, {2, 3, 58, 59, 6, 7, 62, 63}},
             //Hexa {0 1 2 3 56 57 59 58}
-            //--------------------------
             {HEXA_POINTS, {0, 8, 64, 32, 56, 112, 144, 136}},
             {HEXA_POINTS, {8, 9, 65, 64, 112, 113, 145, 144}},
             {HEXA_POINTS, {9, 1, 33, 65, 113, 57, 137, 145}},
@@ -179,7 +178,6 @@ namespace patterns {
             {HEXA_POINTS, {35, 33, 1, 2, 139, 137, 57, 59}},
             {HEXA_POINTS, {2, 3, 34, 35, 59, 58, 138, 139}},
             //Hexa {57 56 0 1 61 60 4 5}
-            //--------------------------
             {HEXA_POINTS, {0, 8, 112, 56, 40, 80, 176, 168}},
             {HEXA_POINTS, {8, 9, 113, 112, 80, 81, 177, 176}},
             {HEXA_POINTS, {112, 113, 57, 56, 176, 177, 170, 168}},
@@ -195,7 +193,6 @@ namespace patterns {
             {HEXA_POINTS, {41, 43, 171, 169, 4, 5, 61, 60}},
             {HEXA_POINTS, {42, 1, 57, 170, 43, 5, 61, 171}},
             //Hexa {3 0 56 58 7 4 60 62}
-            //--------------------------
             {HEXA_POINTS, {0, 56, 114, 10, 44, 184, 192, 88}},
             {HEXA_POINTS, {10, 114, 115, 11, 88, 192, 193, 89}},
             {HEXA_POINTS, {114, 56, 58, 115, 192, 184, 186, 193}},
@@ -1648,22 +1645,26 @@ namespace patterns {
 
 	   for (Uint i=0; i<SIZE; i++) {
 	      if (row[i].mask == mask) {
-	         /** /
-	         if(row[i].mask == 90 || row[i].mask == 173 || row[i].mask == 175 || row[i].mask == 235 || row[i].mask == 29) // DEBUG
-               cout << "\nTemplate: T8; mask: " << row[i].mask; // DEBUG
-	         if(row[i].mask == 141 || row[i].mask == 77 || row[i].mask == 143 || row[i].mask == 93 || row[i].mask == 221 || row[i].mask == 29) // DEBUG
-               cout << "\nTemplate: T6; mask: " << row[i].mask;
-	         if(row[i].mask == 73) // DEBUG
-               cout << "\nTemplate: T2; mask 3B: " << row[i].mask;
 	         /**/
 	         if(row[i].mask == 73) // DEBUG
                cout << "\nPattern: 3B (mask: " << row[i].mask << ")";
+	         if(row[i].mask == 10) // DEBUG
+               cout << "\nPattern: 2B (mask: " << row[i].mask << ")";
 	         if(row[i].mask == 75) // DEBUG
                cout << "\nPattern: 4D (mask: " << row[i].mask << ")";
 	         if(row[i].mask == 40) // DEBUG
                cout << "\nPattern: 2C (mask: " << row[i].mask << ")";
 	         if(row[i].mask == 88) // DEBUG
                cout << "\nPattern: 3C (mask: " << row[i].mask << ")";
+	         if(row[i].mask == 93) // DEBUG
+               cout << "\nPattern: 5B (mask: " << row[i].mask << ")";
+	         if(row[i].mask == 90) // DEBUG
+               cout << "\nPattern: 4F (mask: " << row[i].mask << ")";
+	         if(row[i].mask == 173) // DEBUG
+               cout << "\nPattern: 5C (mask: " << row[i].mask << ")";
+	         if(row[i].mask == 235) // DEBUG
+               cout << "\nPattern: 6C (mask: " << row[i].mask << ")";
+	         /** /
 	         if(row[i].mask == 27) // DEBUG
                cout << "\nPattern: 4B (mask: " << row[i].mask << ")";
 	         if(row[i].mask == 141) // DEBUG
@@ -1671,19 +1672,14 @@ namespace patterns {
 	         if(row[i].mask == 139) // DEBUG
                cout << "\nPattern: 4C (mask: " << row[i].mask << ")";
             if(row[i].mask == 29) // DEBUG
-               cout << "\nPattern: 4C.2 (mask: " << row[i].mask << ")";
-	         if(row[i].mask == 93) // DEBUG
-               cout << "\nPattern: 5B (mask: " << row[i].mask << ")";
-	         if(row[i].mask == 90) // DEBUG
-               cout << "\nPattern: 4F (mask: " << row[i].mask << ")";
-	         if(row[i].mask == 173) // DEBUG
-               cout << "\nPattern: 5C (mask: " << row[i].mask << ")";
+               cout << "\nPattern: 4C.b (mask: " << row[i].mask << ")";
 	         if(row[i].mask == 95) // DEBUG
                cout << "\nPattern: 6B (mask: " << row[i].mask << ")";
-	         if(row[i].mask == 235) // DEBUG
-               cout << "\nPattern: 6C (mask: " << row[i].mask << ")";
-	         //if(row[i].mask == 31) // DEBUG
-               //cout << "\nPattern: T5A (mask: " << row[i].mask << ") **";
+	         if(row[i].mask == 31) // DEBUG
+               cout << "\nPattern: T5A (mask: " << row[i].mask << ")";
+	         /**/
+	         if(row[i].mask == 43) // DEBUG
+               cout << "\nPattern: T4C.b** (mask: " << row[i].mask << ")";
 	         /**/
 	         const item *it = templates[row[i].template_ix].items;
 	         for(Uint j=0; j<MAX_ELEMENTS; j++) {
