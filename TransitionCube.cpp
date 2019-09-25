@@ -139,7 +139,7 @@ namespace patterns {
 						mask |=1UL<<InternalToExternal[(*it).second.getRotatedTransitionPoint()];
 						//cout << InternalToExternal[(*it).second.getRotatedTransitionPoint()] << " ";
 					}
-					if ( (*it).first == (*Iter) && (Iter != m_edges.end()) ) {				
+					if ((Iter != m_edges.end()) && (*it).first == (*Iter)) {
 						// Puts into local vector the point number the result 
 						// of rotated edge points.
 						m_rotated_edges.push_back((*it).second.getRotatedTransitionPoint());

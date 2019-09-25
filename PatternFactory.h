@@ -43,59 +43,40 @@ static const Uint NUM_PATTERNS  =26;
 class PatternFactory {
 public:
     
-    // Struct to contain points and size of one element.
-    struct item {
-        Uint size;
-        Uint points[CORNER_POINTS];
-    };
+   /// Contains size (#points) & points that define one element.
+   struct item {
+      Uint size;
+      Uint points[CORNER_POINTS];
+   };
 
-/* OLD * /
-    // Struct contains one element and the mask its edge point associated.
-    struct Element {
-        Uint mask;
-        item items[MAX_ELEMENTS];
-    };
-/* /OLD */
+   /// Struct for a template definition (T2, T3, T4, T40, etc...)
+   struct Template_st{
+      Uint id; // unnecessary
+      item items[MAX_ELEMENTS];
+   };
 
-    /// NEW; templates definition (T2, T3, T4, T40, etc...)
-    struct Template_st{
-       Uint id; // necessary?
-       item items[MAX_ELEMENTS];
-    };
+   static PatternFactory *instance();
+   static void deleteInstance();
+   //virtual void createPattern(vector< vector<Uint> > & p);
+   bool createPattern(Uint);
+   void vectors(vector< vector<Uint> > & p ) { p = pattern; };
 
-    /// NEW; Pattern table entry (pattern -> template)
-    struct PatternTemplateMap{ // TODO encontrar mejor nombre =P
-       /// pattern mask (same as mask of Element struct)
-       Uint mask;
-       /// Index of template (In array of templates def.)
-       Uint template_ix; // or use? Uint template_id; ??
-    };
-
-    static PatternFactory *instance();
-    static void deleteInstance();
-
-    //virtual void createPattern(vector< vector<Uint> > & p);
-    bool createPattern(Uint);
-
-    void vectors(vector< vector<Uint> > & p ) { p = pattern; };
 private:
-    PatternFactory() { };
+   PatternFactory() { };
+   PatternFactory(const PatternFactory &) { };
+   virtual ~PatternFactory() { };
+   PatternFactory& operator=(PatternFactory const&){ return *this; };
 
-    virtual ~PatternFactory() { };
-    PatternFactory(const PatternFactory &) { };
-    PatternFactory& operator=(PatternFactory const&){ return *this; };
+   /// Array of templates (their definition)
+   static const Template_st templates[];
+   /// pattern_mask --> template_ix (on templates array)
+   static const std::map<Uint, Uint> pattern_template_map;
+   /// Storages the elements of the template for the pattern found
+   vector< vector<Uint> > pattern;
 
-    //static const Element elements[]; //OLD
-    static const Template_st templates[];
-    static const PatternTemplateMap pattern_table[];
-
-    static PatternFactory* m_Instance;
-    static int m_NumInstances;
-
-    vector< vector<Uint> > pattern;
-
+   static PatternFactory* m_Instance;
+   static int m_NumInstances;
 };
-
 }
 
 #endif /* PATTERN_FACTORY_H_ */

@@ -254,8 +254,8 @@ Uint TransitionTemplate::getNewElements(const UintVec &hex_idxs,
         Point3D p6 = mesh_point[hex_idxs[points.find(6)->second]].getPoint();
         Point3D p7 = mesh_point[hex_idxs[points.find(7)->second]].getPoint();
 
-        vector<Point3D> pt(232); //12 ptos nuevos por T40 y 66 ptos por T7
-        pt.clear();
+        vector<Point3D> pt(232);
+        //pt.clear(); // VS crashes w/ this
 
         pt[0] = p0;
         pt[1] = p1;

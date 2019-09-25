@@ -67,224 +67,220 @@ namespace patterns {
 class TransitionTemplate {
 
 public:
-    typedef map<Uint, Uint>         UintMap;
-    typedef UintMap::iterator       UintMapIt;
+   typedef map<Uint, Uint>         UintMap;
+   typedef UintMap::iterator       UintMapIt;
 
-    typedef vector<Uint>            UintVec;
-    typedef UintVec::const_iterator UintVecIt;
+   typedef vector<Uint>            UintVec;
+   typedef UintVec::const_iterator UintVecIt;
 
-    typedef vector< UintVec >       VectorTable;
-    typedef VectorTable::iterator   VectorTableIt;
+   typedef vector< UintVec >       VectorTable;
+   typedef VectorTable::iterator   VectorTableIt;
 
-    typedef vector<MeshPoint> MeshPointVec;
-	
-	typedef list<Point3D>			Point3DList;
-	typedef Point3DList::iterator	Point3DIt;
+   typedef vector<MeshPoint> MeshPointVec;
 
-    
-    enum Coordinate { X, Y, Z };
+   typedef list<Point3D>			Point3DList;
+   typedef Point3DList::iterator	Point3DIt;
 
-    /**
-     * Internal struct to link external to local points.
-     */
-    struct CubeMapping_t {
-        //Default constructor
-        CubeMapping_t (): Local(0), External(0) { };
+   enum Coordinate { X, Y, Z };
 
-        //Default constructor
-        CubeMapping_t (Uint p1, Uint p2): Local(p1), External(p2) { };
+   /**
+    * Internal struct to link external to local points.
+    */
+   struct CubeMapping_t {
+      /// Default constructor.
+      CubeMapping_t (): Local(0), External(0) { };
 
-        //Copy constructor
-        CubeMapping_t (const CubeMapping_t & m ) { *this = m; };
+      /// Default constructor.
+      CubeMapping_t (Uint p1, Uint p2): Local(p1), External(p2) { };
 
-        //Assignment operator
-        CubeMapping_t & operator=( const CubeMapping_t & m ) {
-            if (*this != m) {
-                Local = m.Local;
-                External = m.External;
-            }
-            return *this;
-        }
+      /// Copy constructor.
+      CubeMapping_t (const CubeMapping_t & m ) { *this = m; };
 
-        //Equals operator
-        bool operator ==(const CubeMapping_t &m) const {
-            return ((Local == m.Local)&&(External == m.External));
-        }
+      /// Assignment operator.
+      CubeMapping_t & operator=( const CubeMapping_t & m ) {
+         if (*this != m) {
+            Local = m.Local;
+            External = m.External;
+         }
+         return *this;
+      }
 
-        //Not Equals operator
-        bool operator !=(const CubeMapping_t &m) const {
-            return ((Local != m.Local) || (External != m.External));
-        }
+      /// Equals operator.
+      bool operator ==(const CubeMapping_t &m) const {
+         return ((Local == m.Local)&&(External == m.External));
+      }
 
-        Uint Local;
-        Uint External;
-    };
+      /// Not Equals operator.
+      bool operator !=(const CubeMapping_t &m) const {
+         return ((Local != m.Local) || (External != m.External));
+      }
 
-    struct Permutations_t {
-        //Default constructor
-        Permutations_t (): Axis(X), Step(0) { };
+      Uint Local;
+      Uint External;
+   };
 
-        //Default constructor
-        Permutations_t (Coordinate c, int s): Axis(c), Step(s) { };
+   struct Permutations_t {
+      /// Default constructor.
+      Permutations_t (): Axis(X), Step(0) { };
 
-        //Copy constructor
-        Permutations_t (const Permutations_t & p ) { *this = p; };
+      /// Default constructor.
+      Permutations_t (Coordinate c, int s): Axis(c), Step(s) { };
 
-        //Assignment operator
-        Permutations_t & operator=( const Permutations_t & p ) {
-            if (*this != p) {
-                Axis = p.Axis;
-                Step = p.Step;
-            }
-            return *this;
-        }
+      /// Copy constructor.
+      Permutations_t (const Permutations_t & p ) { *this = p; };
 
-        //Equals operator
-        bool operator ==(const Permutations_t &p) const {
-            return ((Axis == p.Axis)&&(Step == p.Step));
-        }
+      /// Assignment operator.
+      Permutations_t & operator=( const Permutations_t & p ) {
+         if (*this != p) {
+            Axis = p.Axis;
+            Step = p.Step;
+         }
+         return *this;
+      }
 
-        //Not Equals operator
-        bool operator !=(const Permutations_t &p) const {
-            return ((Axis != p.Axis) || (Step != p.Step));
-        }
+      /// Equal operator.
+      bool operator ==(const Permutations_t &p) const {
+         return ((Axis == p.Axis)&&(Step == p.Step));
+      }
 
-        Coordinate Axis;
-        int Step;
-    };
-    
-    /**
-     * Default constructor.
-     * Creates a default eight corner point cube.
-     */
-    TransitionTemplate(const set<unsigned long>&);
+      /// Not Equal operator.
+      bool operator !=(const Permutations_t &p) const {
+         return ((Axis != p.Axis) || (Step != p.Step));
+      }
 
-    /**
-     * Cube parametric constructor.
-     * Takes first eight number as corner points, the other input number are
-     * not considered.
-     */
-    TransitionTemplate( const UintVec&, const set<unsigned long>& );
+      Coordinate Axis;
+      int Step;
+   };
 
-    /**
-     * Cube parametric constructor.
-     * Takes first eight number as corner points, the left number are taking
-     * as edge points. 
-     * The second vector is the mapping of edge points to internal convention.
-     */
-    TransitionTemplate(const UintVec&, const UintVec&, const set<unsigned long>& );
+   /**
+    * Default constructor.
+    * Creates a default eight corner point cube.
+    */
+   TransitionTemplate(const set<unsigned long>&);
 
-    virtual ~TransitionTemplate() { delete m_cube; factory->deleteInstance(); };
+   /**
+    * Cube parametric constructor.
+    * Takes first eight number as corner points, the other input number are
+    * not considered.
+    */
+   TransitionTemplate( const UintVec&, const set<unsigned long>& );
 
-    /**
-     * Rotates the cube to left or right position in one of the 
-     * three x,y,z axis.
-     *
-     * For each of the axis movement has been defined a default 
-     * start position.
-     *
-     * Axis 'z' start position
-     *      4----9------7     5-----------6      3-----------2
-     *     /|          /|    /|          /|     /|          /|
-     *    / |         / |   / |         / |    / 8         / |
-     *   5-----------6  |  1-----------2  |   7-----------6  |
-     *   |  |        |  |  |  |        |  |   |  |        |  |
-     *   |  0----8---|--3  |  4----9---|--7   9  0--------|--1
-     *   | /         | /   | /         | /    | /         | / 
-     *   |/          |/    |/          |/     |/          |/  
-     *   1-----------2     0----8------3      4-----------5  
-     *
-     * Saves the pattern found in a vector of integer vectors.
-     */
-    bool findPattern();
+   /**
+    * Cube parametric constructor.
+    * Takes first eight number as corner points, the left number are taking
+    * as edge points. 
+    * The second vector is the mapping of edge points to internal convention.
+    */
+   TransitionTemplate(const UintVec&, const UintVec&, const set<unsigned long>& );
 
-    /**
-     * Reset both nodes map and local vector.
-     */
-    void reset();
+   virtual ~TransitionTemplate() { delete m_cube; factory->deleteInstance(); };
 
-    /**
-     * Return final pattern result.
-     */
-    //void vectors(VectorTable &v) { v = m_result; }; 
-    void vectors(VectorTable &); 
-    void normal_vectors(VectorTable &); 
+   /**
+    * Rotates the cube to left or right position in one of the 
+    * three x,y,z axis.
+    *
+    * For each of the axis movement has been defined a default 
+    * start position.
+    *
+    * Axis 'z' start position
+    *      4----9------7     5-----------6      3-----------2
+    *     /|          /|    /|          /|     /|          /|
+    *    / |         / |   / |         / |    / 8         / |
+    *   5-----------6  |  1-----------2  |   7-----------6  |
+    *   |  |        |  |  |  |        |  |   |  |        |  |
+    *   |  0----8---|--3  |  4----9---|--7   9  0--------|--1
+    *   | /         | /   | /         | /    | /         | / 
+    *   |/          |/    |/          |/     |/          |/  
+    *   1-----------2     0----8------3      4-----------5  
+    *
+    * Saves the pattern found in a vector of integer vectors.
+   */
+   bool findPattern();
 
-    double getAxis(double min, double max, float val);
+   /**
+    * Reset both nodes map and local vector.
+    */
+   void reset();
 
-    Uint getNewElements(VectorTable &);
-    Uint getNewElements(const UintVec&, 
-            const UintVec&, 
-            MeshPointVec &, 
-            Point3DList&, 
-            VectorTable&,
-            set<unsigned long>&,
-            vector<Point3D> &,
-            vector<unsigned long> &,
-            bool); 
+   /**
+   * Return final pattern result.
+   */
+   //void vectors(VectorTable &v) { v = m_result; }; 
+   void vectors(VectorTable &); 
+   void normal_vectors(VectorTable &); 
+
+   double getAxis(double min, double max, float val);
+
+   Uint getNewElements(VectorTable &);
+   Uint getNewElements(const UintVec&, 
+                       const UintVec&, 
+                       MeshPointVec &, 
+                       Point3DList&, 
+                       VectorTable&,
+                       set<unsigned long>&,
+                       vector<Point3D> &,
+                       vector<unsigned long> &,
+                       bool); 
 
 private:
 
-    /**
-     * Initializes hexahedron pattern to default node positions.
-     */
-    void initialize();
+   /**
+    * Initializes hexahedron pattern to default node positions.
+    */
+   void initialize();
 
-    /** 
-     *  Creates an internal map of the input nodes into defined vertexs
-     *  numbered from 0 to 25 of a basic hexahedron. The first eight nodes
-     *  (0-7) are the corner vertexs of this hexahedron, the other left
-     *  nodes are vertexs located either at any edges or any of the faces
-     *  of this hexahedron.
-     */
-    void createLocalMapping(const UintVec& );
+   /** 
+    *  Creates an internal map of the input nodes into defined vertexs
+    *  numbered from 0 to 25 of a basic hexahedron. The first eight nodes
+    *  (0-7) are the corner vertexs of this hexahedron, the other left
+    *  nodes are vertexs located either at any edges or any of the faces
+    *  of this hexahedron.
+    */
+   void createLocalMapping(const UintVec& );
 
-    void createDefaultMapping();
+   void createDefaultMapping();
 
-    /**
-     * Insert the first eight points of input vector and insert them
-     * into the internal map of nodes.
-     */
-    void createNodesMapping(const UintVec&);
+   /**
+    * Insert the first eight points of input vector and insert them
+    * into the internal map of nodes.
+    */
+   void createNodesMapping(const UintVec&);
 
-    /**
-     * Takes all the edge input points and insert them into a local vector.
-     */
-    void createEdgesMapping(const UintVec&, const UintVec&);
+   /**
+    * Takes all the edge input points and insert them into a local vector.
+    */
+   void createEdgesMapping(const UintVec&, const UintVec&);
 
-    TransitionCube * m_cube;
+   TransitionCube * m_cube;
 
-    bitset<27> bitMask;
+   bitset<27> bitMask;
 
-    //This vector will keep a local copy of edge nodes.
-    UintVec m_localVector;
+   /// This vector will keep a local copy of edge nodes.
+   UintVec m_localVector;
 
 
-    typedef map<Uint, CubeMapping_t> PatternMap_t;
-    typedef PatternMap_t::const_iterator MapIter;
+   typedef map<Uint, CubeMapping_t> PatternMap_t;
+   typedef PatternMap_t::const_iterator MapIter;
 
-    // Map: Point --> (Local, External)
-    PatternMap_t m_NodesMap;
+   /// Map: Point --> (Local, External)
+   PatternMap_t m_NodesMap;
 
-    VectorTable m_result;
+   VectorTable m_result;
 
-    /**
-     * Matrix of rotations
-     * Return new vertex values after one turn in one of the three x,y,z axis.
-     */
-    static const Permutations_t RotationMatrix[];
+   /**
+    * Matrix of rotations
+    * Return new vertex values after one turn in one of the three x,y,z axis.
+    */
+   static const Permutations_t RotationMatrix[];
 
-    /**
-     * Mask is the result to left shift number 1 by the value of the edge point.
-     * Final outcome is a logical OR combination of all edge points in the pattern.
-     */ 
-    static const int PatternMask[];
+   /**
+    * Mask is the result to left shift number 1 by the value of the edge point.
+    * Final outcome is a logical OR combination of all edge points in the pattern.
+    */ 
+   static const int PatternMask[];
 
-    PatternFactory *factory;
-
+   PatternFactory *factory;
 };
-
-
 
 }
 
