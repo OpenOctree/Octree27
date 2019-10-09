@@ -332,6 +332,9 @@ namespace Clobscode
       tpv.setEdges(octreeEdges);
       tpv.setMaxRefLevel(rl);
       tpv.setPuntosExtras(puntosVector, idxsVector, idxsRefinados); //Contadores de puntos extras agregados por los patrones
+
+      vector<vector<unsigned long>> edges_to_refine;
+      tpv.setToRefineList(edges_to_refine);
  
       while (!one_irregular) {
          one_irregular = true;
@@ -375,6 +378,67 @@ namespace Clobscode
             }
             else {
                new_octants.push_back(*iter);
+
+               if (edges_to_refine.size() > 0) {
+                  one_irregular = false;
+                  // DEBUG
+                  cout << "edges_to_refine.size = " << edges_to_refine.size() << endl;
+                  vector<unsigned long> pi = iter->getPoints();
+                  cout << "<hexa_ref>: \n";
+                  for (unsigned long i = 0; i < 8; i++) {
+                     cout << "[" << pi[i] << "] " << points[pi[i]] << endl;
+                  }
+
+                  //for (vector<unsigned long> v : edges_to_refine) {
+                  //for (vector<vector<unsigned long>>::iterator vt = edges_to_refine.begin(); vt != edges_to_refine.end(); vt++){
+                  for (int k =0; k < edges_to_refine.size(); k++){
+                     //OctreeEdge this_edge(vt->at(0), vt->at(1));
+                     OctreeEdge this_edge(edges_to_refine[k][0], edges_to_refine[k][1]);
+                     set<OctreeEdge>::iterator old_edge = octreeEdges.find(this_edge);
+
+                     // DEBUG
+                     if (old_edge == octreeEdges.end()) {
+                        cout << "\nERROR, edge not found in MESHER\n edge: " << this_edge << endl;
+                        exit(EXIT_FAILURE);
+                     }
+
+                     cout << "Edge found: " << *old_edge << endl;
+
+                     if ((*old_edge)[2] == 0) {
+                        unsigned long id2 = points.size() + new_pts.size();
+                        unsigned long id3 = points.size() + new_pts.size() + 1;
+                        this_edge.updateMidPoint(id2, id3);
+                        octreeEdges.erase(old_edge); // ??? why not upd old_edge instead of erasing it
+                        OctreeEdge e1(this_edge[0], this_edge[2]), e2(this_edge[2], this_edge[3]), e3(this_edge[3], this_edge[1]);
+
+                        //debug
+                        set<OctreeEdge>::iterator aux = octreeEdges.find(e2);
+                        if (aux != octreeEdges.end())
+                           cout << "ERROR, edge nuevo ya existia (e2)? " << e2 << endl;
+
+                        octreeEdges.insert(this_edge);
+                        octreeEdges.insert(e1);
+                        octreeEdges.insert(e2);
+                        octreeEdges.insert(e3);
+
+                        
+                        //Point3D p0 = points[vt->at(0)].getPoint();
+                        //Point3D p1 = points[vt->at(1)].getPoint();
+                        Point3D p0 = points[edges_to_refine[k][0]].getPoint();
+                        Point3D p1 = points[edges_to_refine[k][1]].getPoint();
+                        Point3D p2 = p0 + ((p1 - p0) * (1.0 / 3.0));
+                        Point3D p3 = p0 + ((p1 - p0) * (2.0 / 3.0));
+                        new_pts.push_back(p2);
+                        new_pts.push_back(p3);
+                        cout << "<edge_ref> " << this_edge << "</edge_ref>" << endl;
+                     }
+                     else {
+                        cout << "ERROR, se supone que este edge no estaba refinado (MESHER)" << endl;
+                     }
+                     cout << "</hexa_ref>" << endl;
+                  }
+                  edges_to_refine.clear();
+               }
             }
          }
 

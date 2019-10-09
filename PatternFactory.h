@@ -60,6 +60,8 @@ public:
    //virtual void createPattern(vector< vector<Uint> > & p);
    bool createPattern(Uint);
    void vectors(vector< vector<Uint> > & p ) { p = pattern; };
+   
+   void getTemplateEdges(Uint mask, vector<vector<Uint>>& edges);
 
 private:
    PatternFactory() { };
@@ -69,8 +71,10 @@ private:
 
    /// Array of templates (their definition)
    static const Template_st templates[];
-   /// pattern_mask --> template_ix (on templates array)
-   static const std::map<Uint, Uint> pattern_template_map;
+   /// Maps pattern_mask --> template_ix (on templates array)
+   static const map<Uint, Uint> pattern_template_map;
+   /// Edges that must be split for each template.
+   static const map<Uint, vector<vector<Uint>>> template_edges_map;
    /// Storages the elements of the template for the pattern found
    vector< vector<Uint> > pattern;
 

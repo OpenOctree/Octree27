@@ -222,6 +222,8 @@ public:
                        vector<unsigned long> &,
                        bool); 
 
+   void getEdgesToRefine(VectorTable* e); // NEW
+
 private:
 
    /**

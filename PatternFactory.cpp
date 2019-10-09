@@ -50,7 +50,7 @@ namespace patterns {
       {31, 8},     // 5A --> T5A  [ 0 1 2 3 4 ]
       // T6
       {221, 9},    // 6A --> T6   [ 0 3 2 4 7 6 ]
-      {40, 9},     // 2C --> T6   [ 3 5 ]0
+      {40, 9},     // 2C --> T6   [ 3 5 ]
       {88, 9},     // 3C --> T6   [ 3 4 6 ]
       {93, 9},     // 5B --> T6   [ 0 3 2 4 6 ]
       // T6B
@@ -665,6 +665,76 @@ namespace patterns {
       }
    };
 
+   const map<Uint, vector<vector<Uint>>> PatternFactory::template_edges_map = {
+      // T2   [ 0 3 ]
+      {1, {
+         {0, 3, 10, 11}}},
+      // T3   [ 0 1 3]   
+      {2, {
+         {0, 1, 8, 9},
+         {0, 3, 10, 11}}},
+      // T4   [ 0 1 3 2 ]
+      {3, {
+         {0, 1, 8, 9},
+         {0, 3, 10, 11},
+         {1, 2, 12, 13},
+         {3, 2, 14, 15}}}, // TODO corroborar que esta bien el orden aca
+      // T40  [ 0 1 7 6 ]
+      {4, {
+         {0, 1, 8, 9},
+         {7, 6, 22, 23}}}, // TODO orden?
+      // T4B  [0 1 3 4]
+      {5, {
+         {0, 1, 8, 9},
+         {0, 3, 10, 11},
+         {0, 4, 24, 25}}},
+      // T4C  [0 1 3 7]
+      {6, {
+         {0, 1, 8, 9},
+         {0, 3, 10, 11},
+         {3, 7, 28, 29}}},
+      // T4Cb [0 2 3 4]
+      {7, {
+         {0, 3, 10, 11},
+         {0, 4, 24, 25},
+         {3, 2, 14, 15}}},
+      // T5A  [ 0 1 2 3 4 ]
+      {8, {
+         {0, 1, 8, 9},
+         {0, 3, 10, 11},
+         {1, 2, 12, 13},
+         {3, 2, 14, 15},
+         {0, 4, 24, 25}}},
+      // T6   [ 0 3 2 4 7 6 ]
+      {9, {
+         {0, 3, 10, 11},
+         {3, 2, 14, 15},
+         {4, 7, 18, 19},
+         {7, 6, 22, 23},
+         {0, 4, 24, 25},
+         {3, 7, 28, 29},
+         {2, 6, 30, 31}}},
+      // T6B  [0 1 2 3 4 6]
+      {10, {
+         {0, 1, 8, 9},
+         {0, 3, 10, 11},
+         {1, 2, 12, 13},
+         {3, 2, 14, 15},
+         {0, 4, 24, 25},
+         {2, 6, 30, 31}}},
+      // T7   [ 0 1 2 3 4 5 7 ]
+      {11, {
+         {0, 1, 8, 9},
+         {0, 3, 10, 11},
+         {1, 2, 12, 13},
+         {3, 2, 14, 15},
+         {4, 5, 16, 17},
+         {4, 7, 18, 19},
+         {0, 4, 24, 25},
+         {1, 5, 26, 27},
+         {3, 7, 28, 29}}},
+   };
+
    bool PatternFactory::createPattern(Uint mask) {
       pattern.clear();
       std::map<Uint, Uint>::const_iterator temp = pattern_template_map.find(mask);
@@ -688,11 +758,11 @@ namespace patterns {
             cout << "\nPattern: 5C (mask: " << mask << ")";
          if (mask == 235) // DEBUG
             cout << "\nPattern: 6C (mask: " << mask << ")";
-         /** /
+         /**/
          if(mask == 27) // DEBUG
             cout << "\nPattern: 4B (mask: " << mask << ")";
          if(mask == 141) // DEBUG
-            cout << "\nPattern: 4B (mask: " << mask << ")";
+            cout << "\nPattern: 4B** (mask: " << mask << ")";
          if(mask == 139) // DEBUG
             cout << "\nPattern: 4C (mask: " << mask << ")";
          if(mask == 29) // DEBUG
@@ -701,6 +771,10 @@ namespace patterns {
             cout << "\nPattern: 6B (mask: " << mask << ")";
          if(mask == 31) // DEBUG
             cout << "\nPattern: T5A (mask: " << mask << ")";
+         if (mask == 221) // DEBUG
+            cout << "\nPattern: T6 (mask: " << mask << ")";
+         if (mask == 191) // DEBUG
+            cout << "\nPattern: T7 (mask: " << mask << ")";
          /**/
          if (mask == 43) // DEBUG
             cout << "\nPattern: T4C.b** (mask: " << mask << ")";
@@ -716,6 +790,16 @@ namespace patterns {
          return true;
       }
       return false;
+   }
+
+   void PatternFactory::getTemplateEdges(Uint mask, vector<vector<Uint>>& edges) {
+      std::map<Uint, Uint>::const_iterator temp = pattern_template_map.find(mask);
+      if (temp != pattern_template_map.end()) {
+         map<Uint, vector<vector<Uint>>>::const_iterator et = template_edges_map.find(temp->second);
+         if (et != template_edges_map.end()) {
+            edges = et->second;
+         }
+      }
    }
 
    void PatternFactory::deleteInstance () {
