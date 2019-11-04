@@ -860,7 +860,7 @@ void TransitionTemplate::getEdgesToRefine(VectorTable* to_refine) {
    // Check if edges that refines the template are already refined in the hexa.
    for (vector<Uint>& e : edges) {
       UintMapIt p = points.find(e[2]);
-      if (p == points.end()) { // Edge not refined, but it should be.
+      if (p == points.end()) { // Edge is not refined, but it should be.
          // e0 -> px  = ix_local_rotated -> ix_local_original
          Uint px = points.find(e[0])->second;
          Uint py = points.find(e[1])->second;
@@ -885,11 +885,12 @@ void TransitionTemplate::getEdgesToRefine(VectorTable* to_refine) {
          Uint p1 = m_NodesMap.find(py)->second.External;
          to_refine->push_back({ p0, p1 });
          
-         cout << "\n<edges_to_ref> ";
-         cout << "(" << e[0] << ", " << e[1] << ") -> ";
-         cout << "(" << px << ", " << py << ") -> ";
-         cout << "(" << p0 << ", " << p1 << ") ";
-         cout << "</edges_to_ref>" << endl;
+         // DEBUG
+         // cout << "\n<edges_to_ref> ";
+         // cout << "(" << e[0] << ", " << e[1] << ") -> ";
+         // cout << "(" << px << ", " << py << ") -> ";
+         // cout << "(" << p0 << ", " << p1 << ") ";
+         // cout << "</edges_to_ref>" << endl;
       }
    }
 }

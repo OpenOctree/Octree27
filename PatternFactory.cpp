@@ -27,13 +27,13 @@ namespace patterns {
    // T6B  = 10
    // T7   = 11
    // T8   = 12
-   const map<Uint, Uint> PatternFactory::pattern_template_map = {
+   const map<Uint, Uint> PatternFactory::pattern_template_map_newest = {
+      // None: 1, 2B, 2C, 3C, 4F
       // T2
       {9, 1},      // 2A --> T2   [ 0 3 ]
       {73, 1},     // 3B --> T2   [ 0 3 6 ]
       // T3
       {11, 2},     // 3A --> T3   [ 0 1 3 ]
-      {10, 2},     // 2B --> T3   [ 1 3 ]
       {75, 2},     // 4D --> T3   [ 0 1 3 6 ]
       // T4
       {15, 3},     // 4A --> T4   [ 0 1 3 2 ]
@@ -45,24 +45,106 @@ namespace patterns {
       {139, 6},    // 4C --> T4C  [0 1 3 7]
       // T4C.b
       {29, 7},     // 4Cb--> T4Cb [0 2 3 4]
-      {43, 7},     // 4Cb--> T4Cb [0 1 3 5] // TODO este no corresponde
       // T5A
       {31, 8},     // 5A --> T5A  [ 0 1 2 3 4 ]
       // T6
-      {221, 9},    // 6A --> T6   [ 0 3 2 4 7 6 ]
-      {40, 9},     // 2C --> T6   [ 3 5 ]
-      {88, 9},     // 3C --> T6   [ 3 4 6 ]
       {93, 9},     // 5B --> T6   [ 0 3 2 4 6 ]
+      {221, 9},    // 6A --> T6   [ 0 3 2 4 7 6 ]
       // T6B
-      {95, 10},     // 6B --> T6B  [0 1 2 3 4 6]
+      {95, 10},    // 6B --> T6B  [0 1 2 3 4 6]
       // T7
       {191, 11},   //  7 --> T7   [ 0 1 2 3 4 5 7 ]
 /* remove_T8 */
       // T8
-      //{90, 12},     // 4F --> T8   [ 1 3 4 6 ]
-      //{173, 12},    // 5C --> T8   [ 0 3 2 5 7 ]
-      //{235, 12},    // 6C --> T8   [ 0 1 3 5 7 6 ]
-      //{255, 12},   //  8 --> T8   [ 0 1 2 3 4 5 6 7 ]
+      {173, 12},   // 5C --> T8   [ 0 3 2 5 7 ]
+      {235, 12},   // 6C --> T8   [ 0 1 3 5 7 6 ]
+      {255, 12},   //  8 --> T8   [ 0 1 2 3 4 5 6 7 ]
+/* /remove_T8 */
+   };
+
+   // Table from ito et. al (2009) efficient...
+   const map<Uint, Uint> PatternFactory::pattern_template_map_ito = {
+      // None: 1, 2B, 2C, 3C, 4F
+      // T2
+      {9, 1},      // 2A --> T2   [ 0 3 ]
+      {73, 1},     // 3B --> T2   [ 0 3 6 ]
+      // T3
+      {11, 2},     // 3A --> T3   [ 0 1 3 ]
+      {75, 2},     // 4D --> T3   [ 0 1 3 6 ]
+      // T4
+      {15, 3},     // 4A --> T4   [ 0 1 3 2 ]
+      // T40
+      {195, 4},    // 4E --> T40  [ 0 1 7 6 ]
+      // T6
+      {141, 9},    // 4B --> T6   [ 0 2 3 7 ]
+      {77, 9},     // 4C --> T6   [ 0 2 3 6 ]
+      {205, 9},    // 5A --> T6   [ 0 2 3 6 7 ]
+      {93, 9},     // 5B --> T6   [ 0 3 2 4 6 ]
+      {221, 9},    // 6A --> T6   [ 0 3 2 4 7 6 ]
+/* remove_T8 */
+      // T8
+      {173, 12},   // 5C --> T8   [ 0 3 2 5 7 ]
+      {95, 12},    // 6B --> T8   [ 0 1 2 3 4 6 ]
+      {235, 12},   // 6C --> T8   [ 0 1 3 5 7 6 ]
+      {191, 12},   //  7 --> T8   [ 0 1 2 3 4 5 7 ]
+      {255, 12}    //  8 --> T8   [ 0 1 2 3 4 5 6 7 ]
+/* /remove_T8 */
+   };
+
+   // Table from ito et. al (2009) Octree-based reasonable-quality hexahedral mesh...
+   const map<Uint, Uint> PatternFactory::pattern_template_map_ito_A = {
+      // T2
+      {9, 1},      // 2A --> T2   [ 0 3 ]
+      // T3
+      {10, 2},     // 2B --> T3   [ 1 3 ] //INFO Dada la forma en q se buscan patrones; este caso no deberia aparecer nunca.
+      {11, 2},     // 3A --> T3   [ 0 1 3 ]
+      // T4
+      {15, 3},     // 4A --> T4   [ 0 1 3 2 ]
+      // T6
+      {65, 9},     // 2C --> T6   [ 0 6 ]
+      {81, 9},     // 3B --> T6   [ 0 4 6 ]
+      {88, 9},     // 3C --> T6   [ 3 4 6 ]
+      {141, 9},    // 4B --> T6   [ 0 2 3 7 ]
+      {77, 9},     // 4C --> T6   [ 0 2 3 6 ]
+      {149, 9},    // 4D --> T6   [ 0 2 4 7 ]
+      {85, 9},     // 4E --> T6   [ 0 2 4 6 ]
+      {205, 9},    // 5A --> T6   [ 0 2 3 6 7 ]
+      {93, 9},     // 5B --> T6   [ 0 3 2 4 6 ]
+      {221, 9},    // 6A --> T6   [ 0 3 2 4 7 6 ]
+/* remove_T8 */
+      // T8
+      {90, 12},    // 4F --> T8   [ 1 3 4 6 ]
+      {173, 12},   // 5C --> T8   [ 0 3 2 5 7 ]
+      {95, 12},    // 6B --> T8   [ 0 1 2 3 4 6 ]
+      {235, 12},   // 6C --> T8   [ 0 1 3 5 7 6 ]
+      {191, 12},   //  7 --> T8   [ 0 1 2 3 4 5 7 ]
+      {255, 12},   //  8 --> T8   [ 0 1 2 3 4 5 6 7 ]
+/* /remove_T8 */
+   };
+
+   const map<Uint, Uint> PatternFactory::pattern_template_map_ito_B = {
+      // T2
+      {9, 1},      // 2A --> T2   [ 0 3 ]
+      {73, 1},     // 3B --> T2   [ 0 3 6 ]
+      // T3
+      {11, 2},     // 3A --> T3   [ 0 1 3 ]
+      {75, 2},     // 4D --> T3   [ 0 1 3 6 ]
+      // T4
+      {15, 3},     // 4A --> T4   [ 0 1 3 2 ]
+      // T6
+      {141, 9},    // 4B --> T6   [ 0 2 3 7 ]
+      {77, 9},     // 4C --> T6   [ 0 2 3 6 ]
+      {85, 9},     // 4E --> T6   [ 0 2 4 6 ]
+      {205, 9},    // 5A --> T6   [ 0 2 3 6 7 ]
+      {93, 9},     // 5B --> T6   [ 0 3 2 4 6 ]
+      {221, 9},    // 6A --> T6   [ 0 3 2 4 7 6 ]
+/* remove_T8 */
+      // T8
+      {173, 12},   // 5C --> T8   [ 0 3 2 5 7 ]
+      {95, 12},    // 6B --> T8   [ 0 1 2 3 4 6 ]
+      {235, 12},   // 6C --> T8   [ 0 1 3 5 7 6 ]
+      {191, 12},   //  7 --> T8   [ 0 1 2 3 4 5 7 ]
+      {255, 12},   //  8 --> T8   [ 0 1 2 3 4 5 6 7 ]
 /* /remove_T8 */
    };
 
@@ -678,11 +760,11 @@ namespace patterns {
          {0, 1, 8, 9},
          {0, 3, 10, 11},
          {1, 2, 12, 13},
-         {3, 2, 14, 15}}}, // TODO corroborar que esta bien el orden aca
+         {3, 2, 14, 15}}},
       // T40  [ 0 1 7 6 ]
       {4, {
          {0, 1, 8, 9},
-         {7, 6, 22, 23}}}, // TODO orden?
+         {7, 6, 22, 23}}},
       // T4B  [0 1 3 4]
       {5, {
          {0, 1, 8, 9},
@@ -733,51 +815,70 @@ namespace patterns {
          {0, 4, 24, 25},
          {1, 5, 26, 27},
          {3, 7, 28, 29}}},
+      // T8   [ 0 1 2 3 4 5 6 7 ]
+      {12, {
+         {0, 1, 8, 9},
+         {0, 3, 10, 11},
+         {1, 2, 12, 13},
+         {3, 2, 14, 15},
+         {4, 5, 16, 17},
+         {4, 7, 18, 19},
+         {5, 6, 20, 21},
+         {7, 6, 22, 23},
+         {0, 4, 24, 25},
+         {1, 5, 26, 27},
+         {3, 7, 28, 29},
+         {2, 6, 30, 31}}},
    };
 
    bool PatternFactory::createPattern(Uint mask) {
       pattern.clear();
-      std::map<Uint, Uint>::const_iterator temp = pattern_template_map.find(mask);
-      if (temp != pattern_template_map.end()) {
+      std::map<Uint, Uint>::const_iterator temp = pattern_template_map->find(mask);
+      if (temp != pattern_template_map->end()) {
          /**/
-         if (mask == 73) // DEBUG
+         // DEBUG
+         if (mask == 9)
+            cout << "\nPattern: 2A (mask: " << mask << ")";
+         if (mask == 10)
+            cout << "\nPattern: 2B (mask: " << mask << ") (*)";
+         if (mask == 65)
+            cout << "\nPattern: 2C (mask: " << mask << ") (*)";
+         if (mask == 11)
+            cout << "\nPattern: 3A (mask: " << mask << ")";
+         if (mask == 73 || mask == 81)
             cout << "\nPattern: 3B (mask: " << mask << ")";
-         if (mask == 10) // DEBUG
-            cout << "\nPattern: 2B (mask: " << mask << ")";
-         if (mask == 75) // DEBUG
-            cout << "\nPattern: 4D (mask: " << mask << ")";
-         if (mask == 40) // DEBUG
-            cout << "\nPattern: 2C (mask: " << mask << ")";
-         if (mask == 88) // DEBUG
-            cout << "\nPattern: 3C (mask: " << mask << ")";
-         if (mask == 93) // DEBUG
-            cout << "\nPattern: 5B (mask: " << mask << ")";
-         if (mask == 90) // DEBUG
-            cout << "\nPattern: 4F (mask: " << mask << ")";
-         if (mask == 173) // DEBUG
-            cout << "\nPattern: 5C (mask: " << mask << ")";
-         if (mask == 235) // DEBUG
-            cout << "\nPattern: 6C (mask: " << mask << ")";
-         /**/
-         if(mask == 27) // DEBUG
+         if (mask == 88)
+            cout << "\nPattern: 3C (mask: " << mask << ") (*)";
+         if (mask == 15)
+            cout << "\nPattern: 4A (mask: " << mask << ")";
+         if (mask == 27 || mask == 141)
             cout << "\nPattern: 4B (mask: " << mask << ")";
-         if(mask == 141) // DEBUG
-            cout << "\nPattern: 4B** (mask: " << mask << ")";
-         if(mask == 139) // DEBUG
+         if (mask == 139 || mask == 77)
             cout << "\nPattern: 4C (mask: " << mask << ")";
-         if(mask == 29) // DEBUG
-            cout << "\nPattern: 4C.b (mask: " << mask << ")";
-         if(mask == 95) // DEBUG
+         if (mask == 29)
+            cout << "\nPattern: 4Cb (mask: " << mask << ")";
+         if (mask == 75 || mask == 149)
+            cout << "\nPattern: 4D (mask: " << mask << ")";
+         if (mask == 195 || mask == 85)
+            cout << "\nPattern: 4E (mask: " << mask << ")";
+         if (mask == 90)
+            cout << "\nPattern: 4F (mask: " << mask << ") (*)";
+         if (mask == 31 || mask == 205)
+            cout << "\nPattern: 5A (mask: " << mask << ")";
+         if (mask == 93)
+            cout << "\nPattern: 5B (mask: " << mask << ")";
+         if (mask == 173)
+            cout << "\nPattern: 5C (mask: " << mask << ")";
+         if (mask == 221)
+            cout << "\nPattern: 6A (mask: " << mask << ")";
+         if (mask == 95)
             cout << "\nPattern: 6B (mask: " << mask << ")";
-         if(mask == 31) // DEBUG
-            cout << "\nPattern: T5A (mask: " << mask << ")";
-         if (mask == 221) // DEBUG
-            cout << "\nPattern: T6 (mask: " << mask << ")";
-         if (mask == 191) // DEBUG
-            cout << "\nPattern: T7 (mask: " << mask << ")";
-         /**/
-         if (mask == 43) // DEBUG
-            cout << "\nPattern: T4C.b** (mask: " << mask << ")";
+         if (mask == 235)
+            cout << "\nPattern: 6C (mask: " << mask << ")";
+         if (mask == 191)
+            cout << "\nPattern: 7A (mask: " << mask << ")";
+         if (mask == 255)
+            cout << "\nPattern: 8A (mask: " << mask << ")";
          /**/
 
          const item* it = templates[temp->second].items;
@@ -793,8 +894,8 @@ namespace patterns {
    }
 
    void PatternFactory::getTemplateEdges(Uint mask, vector<vector<Uint>>& edges) {
-      std::map<Uint, Uint>::const_iterator temp = pattern_template_map.find(mask);
-      if (temp != pattern_template_map.end()) {
+      std::map<Uint, Uint>::const_iterator temp = pattern_template_map->find(mask);
+      if (temp != pattern_template_map->end()) {
          map<Uint, vector<vector<Uint>>>::const_iterator et = template_edges_map.find(temp->second);
          if (et != template_edges_map.end()) {
             edges = et->second;

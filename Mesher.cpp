@@ -378,16 +378,16 @@ namespace Clobscode
             }
             else {
                new_octants.push_back(*iter);
-
                if (edges_to_refine.size() > 0) {
                   one_irregular = false;
+
                   // DEBUG
-                  cout << "edges_to_refine.size = " << edges_to_refine.size() << endl;
-                  vector<unsigned long> pi = iter->getPoints();
-                  cout << "<hexa_ref>: \n";
-                  for (unsigned long i = 0; i < 8; i++) {
-                     cout << "[" << pi[i] << "] " << points[pi[i]] << endl;
-                  }
+                  // cout << "edges_to_refine.size = " << edges_to_refine.size() << endl;
+                  // vector<unsigned long> pi = iter->getPoints();
+                  // cout << "<hexa_ref>: \n";
+                  // for (unsigned long i = 0; i < 8; i++) {
+                  //    cout << "[" << pi[i] << "] " << points[pi[i]] << endl;
+                  // }
 
                   //for (vector<unsigned long> v : edges_to_refine) {
                   //for (vector<vector<unsigned long>>::iterator vt = edges_to_refine.begin(); vt != edges_to_refine.end(); vt++){
@@ -402,7 +402,8 @@ namespace Clobscode
                         exit(EXIT_FAILURE);
                      }
 
-                     cout << "Edge found: " << *old_edge << endl;
+                     // DEBUG
+                     // cout << "Edge found: " << *old_edge << endl;
 
                      if ((*old_edge)[2] == 0) {
                         unsigned long id2 = points.size() + new_pts.size();
@@ -413,7 +414,7 @@ namespace Clobscode
 
                         //debug
                         set<OctreeEdge>::iterator aux = octreeEdges.find(e2);
-                        if (aux != octreeEdges.end())
+                        if (aux != octreeEdges.end()) // wrong new pt ix calculation.
                            cout << "ERROR, edge nuevo ya existia (e2)? " << e2 << endl;
 
                         octreeEdges.insert(this_edge);
@@ -430,12 +431,15 @@ namespace Clobscode
                         Point3D p3 = p0 + ((p1 - p0) * (2.0 / 3.0));
                         new_pts.push_back(p2);
                         new_pts.push_back(p3);
-                        cout << "<edge_ref> " << this_edge << "</edge_ref>" << endl;
+
+
+                        // cout << "<edge_ref> " << this_edge << "</edge_ref>" << endl;
                      }
                      else {
                         cout << "ERROR, se supone que este edge no estaba refinado (MESHER)" << endl;
                      }
-                     cout << "</hexa_ref>" << endl;
+                     // DEBUG
+                     // cout << "</hexa_ref>" << endl;
                   }
                   edges_to_refine.clear();
                }

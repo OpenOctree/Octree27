@@ -72,7 +72,11 @@ private:
    /// Array of templates (their definition)
    static const Template_st templates[];
    /// Maps pattern_mask --> template_ix (on templates array)
-   static const map<Uint, Uint> pattern_template_map;
+   static const map<Uint, Uint> pattern_template_map_newest;
+   static const map<Uint, Uint> pattern_template_map_ito; // version Ito et al (2009) Efficient Hexa mesh...
+   static const map<Uint, Uint> pattern_template_map_ito_A; // Ito et al. 2009 Octree-based reasonable-quality hexahedral mesh generation using a new set of refinement templates.
+   static const map<Uint, Uint> pattern_template_map_ito_B;
+   static const constexpr map<Uint, Uint>* pattern_template_map = &pattern_template_map_newest;
    /// Edges that must be split for each template.
    static const map<Uint, vector<vector<Uint>>> template_edges_map;
    /// Storages the elements of the template for the pattern found
