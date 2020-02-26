@@ -161,9 +161,9 @@ bool TransitionTemplate::findPattern() {
          return true;
       }
    }
-   // Just for debugging
-   //cout << "\n**No-Pattern report: " << m_cube->reportRotation(); //DEBUG
-   //cout << "\nPattern no encontrado: " << m_cube->getEdgeTransitionPointsMask(); //DEBUG
+   // DEBUG No-Pattern report
+   cout << "\n**No-Pattern report: " << m_cube->reportRotation();
+   //cout << "\nPattern no encontrado: " << m_cube->getEdgeTransitionPointsMask();
    return false;
 }
 
@@ -788,7 +788,8 @@ Uint TransitionTemplate::getNewElements(const UintVec &hex_idxs,
             if(idxs[*it1] == -1){ // Se busca el Id en el vector
                bool flag = false; 
                int i = 0;
-               for(i;i<puntosVector.size();i++){
+               //for(i;i<puntosVector.size();i++){
+               for(;i<puntosVector.size();i++){
                   if(puntosVector[i] == pt[*it1]){ // Se encuentra en el vector global
                         flag = true;
                         break;
@@ -885,7 +886,7 @@ void TransitionTemplate::getEdgesToRefine(VectorTable* to_refine) {
          Uint p1 = m_NodesMap.find(py)->second.External;
          to_refine->push_back({ p0, p1 });
          
-         // DEBUG
+         // DEBUG prints edges to refine (pattern adaptation).
          // cout << "\n<edges_to_ref> ";
          // cout << "(" << e[0] << ", " << e[1] << ") -> ";
          // cout << "(" << px << ", " << py << ") -> ";

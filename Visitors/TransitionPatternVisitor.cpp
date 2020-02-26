@@ -14,6 +14,7 @@ namespace Clobscode {
       idxsRefinados = NULL;
       idxsVector = NULL;
       puntosVector = NULL;
+      edges_to_refine = NULL;
    }
 
    TransitionPatternVisitor::TransitionPatternVisitor(bool apply_pattern) {
@@ -27,6 +28,7 @@ namespace Clobscode {
       idxsRefinados = NULL;
       idxsVector = NULL;
       puntosVector = NULL;
+      edges_to_refine = NULL;
    }
 
    void TransitionPatternVisitor::setPoints(vector<MeshPoint> &points) {
@@ -360,6 +362,7 @@ namespace Clobscode {
 
          // Create the pattern
          patterns::TransitionTemplate tt (nodes, mid_nodes, l_mid_nodes_v);
+         tt.setAssociationTable(assoc_table_name);
          //new points goes to new_pts (if any new node is inserted) and
          //the new elements to new_eles
 
@@ -731,12 +734,13 @@ namespace Clobscode {
          list<MeshPoint> new_pts;
 
          patterns::TransitionTemplate tt (nodes,mid_nodes, l_mid_nodes_v);
+         tt.setAssociationTable(assoc_table_name);
          //find out if the pattern is implemented
             
          unsigned long result = tt.getNewElements(nodes,mid_nodes,*points,local_new_pts,new_eles,l_mid_nodes_v, *puntosVector, *idxsVector, true);
             
          if(result == 0){ // <- Esto significa que no hay patron de transición
-            //Just for debug
+            // DEBUG
             //for(auto it : l_mid_nodes_v) {
             //   idxsRefinados->insert(pointindex[it]);
             //}

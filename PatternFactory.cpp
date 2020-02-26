@@ -11,6 +11,7 @@ using namespace std;
 
 namespace patterns {
    PatternFactory* PatternFactory::m_Instance = NULL;
+   const map<Uint, Uint>* PatternFactory::pattern_template_map = &pattern_template_map_newest;
    int PatternFactory::m_NumInstances = 0;
 
    // template = array_index
@@ -27,6 +28,8 @@ namespace patterns {
    // T6B  = 10
    // T7   = 11
    // T8   = 12
+
+   /// Table with all templates
    const map<Uint, Uint> PatternFactory::pattern_template_map_newest = {
       // None: 1, 2B, 2C, 3C, 4F
       // T2
@@ -40,30 +43,28 @@ namespace patterns {
       // T40
       {195, 4},    // 4E --> T40  [ 0 1 7 6 ]
       // T4B
-      {27, 5},     // 4B --> T4B  [0 1 3 4]
+      {27, 5},     // 4B --> T4B  [ 0 1 3 4 ]
       // T4C
-      {139, 6},    // 4C --> T4C  [0 1 3 7]
+      {139, 6},    // 4C --> T4C  [ 0 1 3 7 ]
       // T4C.b
-      {29, 7},     // 4Cb--> T4Cb [0 2 3 4]
+      {29, 7},     // 4Cb--> T4Cb [ 0 2 3 4 ]
       // T5A
       {31, 8},     // 5A --> T5A  [ 0 1 2 3 4 ]
       // T6
       {93, 9},     // 5B --> T6   [ 0 3 2 4 6 ]
       {221, 9},    // 6A --> T6   [ 0 3 2 4 7 6 ]
       // T6B
-      {95, 10},    // 6B --> T6B  [0 1 2 3 4 6]
+      {95, 10},    // 6B --> T6B  [ 0 1 2 3 4 6 ]
       // T7
       {191, 11},   //  7 --> T7   [ 0 1 2 3 4 5 7 ]
-/* remove_T8 */
       // T8
       {173, 12},   // 5C --> T8   [ 0 3 2 5 7 ]
       {235, 12},   // 6C --> T8   [ 0 1 3 5 7 6 ]
       {255, 12},   //  8 --> T8   [ 0 1 2 3 4 5 6 7 ]
-/* /remove_T8 */
    };
 
-   // Table from ito et. al (2009) efficient...
-   const map<Uint, Uint> PatternFactory::pattern_template_map_ito = {
+   /// Table from ito et. al (2009) efficient...
+   const map<Uint, Uint> PatternFactory::pattern_template_map_ito_C = {
       // None: 1, 2B, 2C, 3C, 4F
       // T2
       {9, 1},      // 2A --> T2   [ 0 3 ]
@@ -78,20 +79,19 @@ namespace patterns {
       // T6
       {141, 9},    // 4B --> T6   [ 0 2 3 7 ]
       {77, 9},     // 4C --> T6   [ 0 2 3 6 ]
+      {29, 9},     // 4Cb--> T6   [ 0 2 3 4 ]
       {205, 9},    // 5A --> T6   [ 0 2 3 6 7 ]
       {93, 9},     // 5B --> T6   [ 0 3 2 4 6 ]
       {221, 9},    // 6A --> T6   [ 0 3 2 4 7 6 ]
-/* remove_T8 */
       // T8
       {173, 12},   // 5C --> T8   [ 0 3 2 5 7 ]
       {95, 12},    // 6B --> T8   [ 0 1 2 3 4 6 ]
       {235, 12},   // 6C --> T8   [ 0 1 3 5 7 6 ]
       {191, 12},   //  7 --> T8   [ 0 1 2 3 4 5 7 ]
       {255, 12}    //  8 --> T8   [ 0 1 2 3 4 5 6 7 ]
-/* /remove_T8 */
    };
 
-   // Table from ito et. al (2009) Octree-based reasonable-quality hexahedral mesh...
+   /// Table A from ito et. al (2009) Octree-based reasonable-quality hexahedral mesh...
    const map<Uint, Uint> PatternFactory::pattern_template_map_ito_A = {
       // T2
       {9, 1},      // 2A --> T2   [ 0 3 ]
@@ -106,12 +106,12 @@ namespace patterns {
       {88, 9},     // 3C --> T6   [ 3 4 6 ]
       {141, 9},    // 4B --> T6   [ 0 2 3 7 ]
       {77, 9},     // 4C --> T6   [ 0 2 3 6 ]
+      {29, 9},     // 4Cb--> T6   [ 0 2 3 4 ]
       {149, 9},    // 4D --> T6   [ 0 2 4 7 ]
       {85, 9},     // 4E --> T6   [ 0 2 4 6 ]
       {205, 9},    // 5A --> T6   [ 0 2 3 6 7 ]
       {93, 9},     // 5B --> T6   [ 0 3 2 4 6 ]
       {221, 9},    // 6A --> T6   [ 0 3 2 4 7 6 ]
-/* remove_T8 */
       // T8
       {90, 12},    // 4F --> T8   [ 1 3 4 6 ]
       {173, 12},   // 5C --> T8   [ 0 3 2 5 7 ]
@@ -119,9 +119,9 @@ namespace patterns {
       {235, 12},   // 6C --> T8   [ 0 1 3 5 7 6 ]
       {191, 12},   //  7 --> T8   [ 0 1 2 3 4 5 7 ]
       {255, 12},   //  8 --> T8   [ 0 1 2 3 4 5 6 7 ]
-/* /remove_T8 */
    };
 
+   /// Table B from ito et. al (2009) Octree-based ...
    const map<Uint, Uint> PatternFactory::pattern_template_map_ito_B = {
       // T2
       {9, 1},      // 2A --> T2   [ 0 3 ]
@@ -134,18 +134,164 @@ namespace patterns {
       // T6
       {141, 9},    // 4B --> T6   [ 0 2 3 7 ]
       {77, 9},     // 4C --> T6   [ 0 2 3 6 ]
+      {29, 9},     // 4Cb--> T6   [ 0 2 3 4 ]
       {85, 9},     // 4E --> T6   [ 0 2 4 6 ]
       {205, 9},    // 5A --> T6   [ 0 2 3 6 7 ]
       {93, 9},     // 5B --> T6   [ 0 3 2 4 6 ]
       {221, 9},    // 6A --> T6   [ 0 3 2 4 7 6 ]
-/* remove_T8 */
       // T8
       {173, 12},   // 5C --> T8   [ 0 3 2 5 7 ]
       {95, 12},    // 6B --> T8   [ 0 1 2 3 4 6 ]
       {235, 12},   // 6C --> T8   [ 0 1 3 5 7 6 ]
       {191, 12},   //  7 --> T8   [ 0 1 2 3 4 5 7 ]
       {255, 12},   //  8 --> T8   [ 0 1 2 3 4 5 6 7 ]
-/* /remove_T8 */
+   };
+
+   // New table, with T7 only (Ito_C + T7)
+   const map<Uint, Uint> PatternFactory::pattern_template_map_T7 = {
+      // None: 1, 2B, 2C, 3C, 4F
+      // T2
+      {9, 1},      // 2A --> T2   [ 0 3 ]
+      {73, 1},     // 3B --> T2   [ 0 3 6 ]
+      // T3
+      {11, 2},     // 3A --> T3   [ 0 1 3 ]
+      {75, 2},     // 4D --> T3   [ 0 1 3 6 ]
+      // T4
+      {15, 3},     // 4A --> T4   [ 0 1 3 2 ]
+      // T40
+      {195, 4},    // 4E --> T40  [ 0 1 7 6 ]
+      // T6
+      {141, 9},    // 4B --> T6   [ 0 2 3 7 ]
+      {77, 9},     // 4C --> T6   [ 0 2 3 6 ]
+      {29, 9},     // 4Cb--> T6   [ 0 2 3 4 ]
+      {205, 9},    // 5A --> T6   [ 0 2 3 6 7 ]
+      {93, 9},     // 5B --> T6   [ 0 3 2 4 6 ]
+      {221, 9},    // 6A --> T6   [ 0 3 2 4 7 6 ]
+      // T7
+      {191, 11},   //  7 --> T7   [ 0 1 2 3 4 5 7 ]
+      // T8
+      {173, 12},   // 5C --> T8   [ 0 3 2 5 7 ]
+      {95, 12},    // 6B --> T8   [ 0 1 2 3 4 6 ]
+      {235, 12},   // 6C --> T8   [ 0 1 3 5 7 6 ]
+      {255, 12}    //  8 --> T8   [ 0 1 2 3 4 5 6 7 ]
+   };
+
+   /// Table ito_C + T6B
+   const map<Uint, Uint> PatternFactory::pattern_template_map_T6B = {
+      // None: 1, 2B, 2C, 3C, 4F
+      // T2
+      {9, 1},      // 2A --> T2   [ 0 3 ]
+      {73, 1},     // 3B --> T2   [ 0 3 6 ]
+      // T3
+      {11, 2},     // 3A --> T3   [ 0 1 3 ]
+      {75, 2},     // 4D --> T3   [ 0 1 3 6 ]
+      // T4
+      {15, 3},     // 4A --> T4   [ 0 1 3 2 ]
+      // T40
+      {195, 4},    // 4E --> T40  [ 0 1 7 6 ]
+      // T6
+      {141, 9},    // 4B --> T6   [ 0 2 3 7 ]
+      {77, 9},     // 4C --> T6   [ 0 2 3 6 ]
+      {29, 9},     // 4Cb--> T6   [ 0 2 3 4 ]
+      {205, 9},    // 5A --> T6   [ 0 2 3 6 7 ]
+      {93, 9},     // 5B --> T6   [ 0 3 2 4 6 ]
+      {221, 9},    // 6A --> T6   [ 0 3 2 4 7 6 ]
+      // T6B
+      {95, 10},    // 6B --> T6B  [ 0 1 2 3 4 6 ]
+      // T8
+      {173, 12},   // 5C --> T8   [ 0 3 2 5 7 ]
+      {235, 12},   // 6C --> T8   [ 0 1 3 5 7 6 ]
+      {191, 12},   //  7 --> T8   [ 0 1 2 3 4 5 7 ]
+      {255, 12}    //  8 --> T8   [ 0 1 2 3 4 5 6 7 ]
+   };
+
+   /// Table ito_C + T5A
+   const map<Uint, Uint> PatternFactory::pattern_template_map_T5A = {
+      // None: 1, 2B, 2C, 3C, 4F
+      // T2
+      {9, 1},      // 2A --> T2   [ 0 3 ]
+      {73, 1},     // 3B --> T2   [ 0 3 6 ]
+      // T3
+      {11, 2},     // 3A --> T3   [ 0 1 3 ]
+      {75, 2},     // 4D --> T3   [ 0 1 3 6 ]
+      // T4
+      {15, 3},     // 4A --> T4   [ 0 1 3 2 ]
+      // T40
+      {195, 4},    // 4E --> T40  [ 0 1 7 6 ]
+      // T5A
+      {31, 8},     // 5A --> T5A  [ 0 1 2 3 4 ]
+      // T6
+      {141, 9},    // 4B --> T6   [ 0 2 3 7 ]
+      {77, 9},     // 4C --> T6   [ 0 2 3 6 ]
+      {29, 9},     // 4Cb--> T6   [ 0 2 3 4 ]
+      {93, 9},     // 5B --> T6   [ 0 3 2 4 6 ]
+      {221, 9},    // 6A --> T6   [ 0 3 2 4 7 6 ]
+      // T8
+      {173, 12},   // 5C --> T8   [ 0 3 2 5 7 ]
+      {95, 12},    // 6B --> T8   [ 0 1 2 3 4 6 ]
+      {235, 12},   // 6C --> T8   [ 0 1 3 5 7 6 ]
+      {191, 12},   //  7 --> T8   [ 0 1 2 3 4 5 7 ]
+      {255, 12}    //  8 --> T8   [ 0 1 2 3 4 5 6 7 ]
+   };
+
+   /// Table ito_C + T4C
+   const map<Uint, Uint> PatternFactory::pattern_template_map_T4C = {
+      // None: 1, 2B, 2C, 3C, 4F
+      // T2
+      {9, 1},      // 2A --> T2   [ 0 3 ]
+      {73, 1},     // 3B --> T2   [ 0 3 6 ]
+      // T3
+      {11, 2},     // 3A --> T3   [ 0 1 3 ]
+      {75, 2},     // 4D --> T3   [ 0 1 3 6 ]
+      // T4
+      {15, 3},     // 4A --> T4   [ 0 1 3 2 ]
+      // T40
+      {195, 4},    // 4E --> T40  [ 0 1 7 6 ]
+      // T4C
+      {139, 6},    // 4C --> T4C  [ 0 1 3 7 ]
+      // T4Cb
+      {29, 7},     // 4Cb--> T4Cb [ 0 2 3 4 ]
+      // T6
+      {141, 9},    // 4B --> T6   [ 0 2 3 7 ]
+      {205, 9},    // 5A --> T6   [ 0 2 3 6 7 ]
+      {93, 9},     // 5B --> T6   [ 0 3 2 4 6 ]
+      {221, 9},    // 6A --> T6   [ 0 3 2 4 7 6 ]
+      // T8
+      {173, 12},   // 5C --> T8   [ 0 3 2 5 7 ]
+      {95, 12},    // 6B --> T8   [ 0 1 2 3 4 6 ]
+      {235, 12},   // 6C --> T8   [ 0 1 3 5 7 6 ]
+      {191, 12},   //  7 --> T8   [ 0 1 2 3 4 5 7 ]
+      {255, 12}    //  8 --> T8   [ 0 1 2 3 4 5 6 7 ]
+   };
+
+   /// Table ito_C + T4B
+   const map<Uint, Uint> PatternFactory::pattern_template_map_T4B = {
+      // None: 1, 2B, 2C, 3C, 4F
+      // T2
+      {9, 1},      // 2A --> T2   [ 0 3 ]
+      {73, 1},     // 3B --> T2   [ 0 3 6 ]
+      // T3
+      {11, 2},     // 3A --> T3   [ 0 1 3 ]
+      {75, 2},     // 4D --> T3   [ 0 1 3 6 ]
+      // T4
+      {15, 3},     // 4A --> T4   [ 0 1 3 2 ]
+      // T40
+      {195, 4},    // 4E --> T40  [ 0 1 7 6 ]
+      // T4B
+      {27, 5},     // 4B --> T4B  [ 0 1 3 4 ]
+      // T6
+      {141, 9},    // 4B --> T6   [ 0 2 3 7 ]
+      {77, 9},     // 4C --> T6   [ 0 2 3 6 ]
+      {29, 9},     // 4Cb--> T6   [ 0 2 3 4 ]
+      {205, 9},    // 5A --> T6   [ 0 2 3 6 7 ]
+      {93, 9},     // 5B --> T6   [ 0 3 2 4 6 ]
+      {221, 9},    // 6A --> T6   [ 0 3 2 4 7 6 ]
+      // T8
+      {173, 12},   // 5C --> T8   [ 0 3 2 5 7 ]
+      {95, 12},    // 6B --> T8   [ 0 1 2 3 4 6 ]
+      {235, 12},   // 6C --> T8   [ 0 1 3 5 7 6 ]
+      {191, 12},   //  7 --> T8   [ 0 1 2 3 4 5 7 ]
+      {255, 12}    //  8 --> T8   [ 0 1 2 3 4 5 6 7 ]
    };
 
 //                      4----------------------7
@@ -836,7 +982,7 @@ namespace patterns {
       std::map<Uint, Uint>::const_iterator temp = pattern_template_map->find(mask);
       if (temp != pattern_template_map->end()) {
          /**/
-         // DEBUG
+         // DEBUG prints patterns found (+ mask)
          if (mask == 9)
             cout << "\nPattern: 2A (mask: " << mask << ")";
          if (mask == 10)
@@ -880,7 +1026,6 @@ namespace patterns {
          if (mask == 255)
             cout << "\nPattern: 8A (mask: " << mask << ")";
          /**/
-
          const item* it = templates[temp->second].items;
          for (Uint j = 0; j < MAX_ELEMENTS; j++) {
             if (it->size == 0)
@@ -903,6 +1048,45 @@ namespace patterns {
       }
    }
 
+   void PatternFactory::setTable(string table_name){
+      if ("table_all" == table_name){
+         pattern_template_map = &pattern_template_map_newest;
+         return;
+      }
+      if ("ito2009_c" == table_name){
+         pattern_template_map = &pattern_template_map_ito_C;
+         return;
+      }
+      if ("ito2009_a" == table_name){
+         pattern_template_map = &pattern_template_map_ito_A;
+         return;
+      }
+      if ("ito2009_b" == table_name){
+         pattern_template_map = &pattern_template_map_ito_B;
+         return;
+      }
+      if ("table_t7" == table_name){
+         pattern_template_map = &pattern_template_map_T7;
+         return;
+      }
+      if ("table_t6b" == table_name){
+         pattern_template_map = &pattern_template_map_T6B;
+         return;
+      }
+      if ("table_t5a" == table_name){
+         pattern_template_map = &pattern_template_map_T5A;
+         return;
+      }
+      if ("table_t4c" == table_name){
+         pattern_template_map = &pattern_template_map_T4C;
+         return;
+      }
+      if ("table_t4b" == table_name){
+         pattern_template_map = &pattern_template_map_T4B;
+         return;
+      }
+   }
+
    void PatternFactory::deleteInstance () {
       if (m_Instance) {
          delete m_Instance;
@@ -911,10 +1095,12 @@ namespace patterns {
    }
 
    PatternFactory* PatternFactory::instance() {
-      if (!m_Instance)
+      if (!m_Instance){
          m_Instance = new PatternFactory();
-      else
+      }
+      else{
          cout << "INSTANCE ALREADY CREATED" << endl;
+      }
       //m_NumInstances++;
       return m_Instance;
    }

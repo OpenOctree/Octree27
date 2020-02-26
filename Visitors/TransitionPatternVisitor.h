@@ -50,6 +50,7 @@ namespace Clobscode {
       void setPuntosExtras(vector<Point3D> &puntosVector, vector<unsigned long> &idxsVector, set<unsigned long> &idxsRefinados);
 
       void setToRefineList(vector<vector<unsigned long>>& to_refine) { edges_to_refine = &to_refine; };
+      void setAssociationTable(string table_name) { assoc_table_name = table_name; };
 
    private:
       vector<MeshPoint> *points;
@@ -64,6 +65,7 @@ namespace Clobscode {
       set<unsigned long> *idxsRefinados;
 
       vector<vector<unsigned long>>* edges_to_refine;
+      string assoc_table_name;
    };
 }
 

@@ -224,6 +224,7 @@ public:
 
    void getEdgesToRefine(VectorTable* e); // NEW
 
+   void setAssociationTable(string assoc_table_name) {factory->setTable(assoc_table_name);};
 private:
 
    /**

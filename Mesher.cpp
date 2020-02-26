@@ -12,40 +12,38 @@
 
 namespace Clobscode
 {
-	//--------------------------------------------------------------------------------
-    //--------------------------------------------------------------------------------
-	Mesher::Mesher(){
-        
-	}
-	
-	//--------------------------------------------------------------------------------
-    //--------------------------------------------------------------------------------
-	
-	Mesher::~Mesher(){
-		
-	}
-	
-	//--------------------------------------------------------------------------------
-    //--------------------------------------------------------------------------------
-	
-	//Create a grid mesh regarding the Bounding Box of input mesh.
-	//This will produce several cubes as roots of an octree structure.
-	//Then split each initial element 8^rl times (where rl stands
-	//for Refinement Level).
-	
-	FEMesh Mesher::generateMesh(void * pClientData,TriMesh &input,
-								const unsigned short &rl,
-								const string &name,
-								list<RefinementRegion *> &all_reg){
+   //--------------------------------------------------------------------------------
+   //--------------------------------------------------------------------------------
+   Mesher::Mesher(){
 
-		GeometricTransform gt;
-        
-		//rotate
-		bool rotated = rotateGridMesh(input, all_reg, gt);
-        
-		//generate root octants
-		generateGridMesh(input);
-		
+   }
+
+   //--------------------------------------------------------------------------------
+   //--------------------------------------------------------------------------------
+   Mesher::~Mesher(){
+
+   }
+
+   //--------------------------------------------------------------------------------
+   //--------------------------------------------------------------------------------
+   //Create a grid mesh regarding the Bounding Box of input mesh.
+   //This will produce several cubes as roots of an octree structure.
+   //Then split each initial element 8^rl times (where rl stands
+   //for Refinement Level).
+   FEMesh Mesher::generateMesh(void * pClientData,TriMesh &input,
+                               const unsigned short &rl,
+                               const string &name,
+                               list<RefinementRegion *> &all_reg,
+                               string table_name){
+
+      GeometricTransform gt;
+      assoc_table_name = table_name;
+      //rotate
+      bool rotated = rotateGridMesh(input, all_reg, gt);
+
+      //generate root octants
+      generateGridMesh(input);
+
 		//split octants until the refinement level (rl) is achieved.
 		//The output will be a one-irregular mesh.
 		generateOctreeMesh(rl,input,all_reg,name);
@@ -332,6 +330,7 @@ namespace Clobscode
       tpv.setEdges(octreeEdges);
       tpv.setMaxRefLevel(rl);
       tpv.setPuntosExtras(puntosVector, idxsVector, idxsRefinados); //Contadores de puntos extras agregados por los patrones
+      tpv.setAssociationTable(assoc_table_name);
 
       vector<vector<unsigned long>> edges_to_refine;
       tpv.setToRefineList(edges_to_refine);
@@ -381,7 +380,7 @@ namespace Clobscode
                if (edges_to_refine.size() > 0) {
                   one_irregular = false;
 
-                  // DEBUG
+                  // DEBUG pattern adaptation (1)
                   // cout << "edges_to_refine.size = " << edges_to_refine.size() << endl;
                   // vector<unsigned long> pi = iter->getPoints();
                   // cout << "<hexa_ref>: \n";
@@ -396,13 +395,13 @@ namespace Clobscode
                      OctreeEdge this_edge(edges_to_refine[k][0], edges_to_refine[k][1]);
                      set<OctreeEdge>::iterator old_edge = octreeEdges.find(this_edge);
 
-                     // DEBUG
+                     // DEBUG  pattern adaptation (2) (edge not found)
                      if (old_edge == octreeEdges.end()) {
                         cout << "\nERROR, edge not found in MESHER\n edge: " << this_edge << endl;
                         exit(EXIT_FAILURE);
                      }
 
-                     // DEBUG
+                     // DEBUG pattern adaptation (3)
                      // cout << "Edge found: " << *old_edge << endl;
 
                      if ((*old_edge)[2] == 0) {
@@ -412,7 +411,7 @@ namespace Clobscode
                         octreeEdges.erase(old_edge); // ??? why not upd old_edge instead of erasing it
                         OctreeEdge e1(this_edge[0], this_edge[2]), e2(this_edge[2], this_edge[3]), e3(this_edge[3], this_edge[1]);
 
-                        //debug
+                        //debug  pattern adaptation (4) (
                         set<OctreeEdge>::iterator aux = octreeEdges.find(e2);
                         if (aux != octreeEdges.end()) // wrong new pt ix calculation.
                            cout << "ERROR, edge nuevo ya existia (e2)? " << e2 << endl;
@@ -438,7 +437,7 @@ namespace Clobscode
                      else {
                         cout << "ERROR, se supone que este edge no estaba refinado (MESHER)" << endl;
                      }
-                     // DEBUG
+                     // DEBUG pattern adaptation (5)
                      // cout << "</hexa_ref>" << endl;
                   }
                   edges_to_refine.clear();
