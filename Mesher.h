@@ -32,70 +32,54 @@ using Clobscode::OctreeEdge;
 using Clobscode::TriMesh;
 using Clobscode::RefinementRegion;
 
-namespace Clobscode
-{
-	
-	class Mesher{
-		
-	public:
-		
-		Mesher();
-		
-		virtual ~Mesher();
-				
-		virtual FEMesh generateMesh(void * pClientData, TriMesh &input,
-                                    const unsigned short &rl, const string &name,
-									list<RefinementRegion *> &all_reg);
-		
-	protected:
-		
-		virtual void generateOctreeMesh(const unsigned short &rl, TriMesh &input,
-                                        list<RefinementRegion *> &all_reg, const string &name);
+namespace Clobscode {
 
-		virtual bool isItIn(TriMesh &mesh, list<unsigned long> &faces, vector<Point3D> &coords);
+   class Mesher{
 
-		virtual bool rotateGridMesh(TriMesh &input,
-									list<RefinementRegion *> &all_reg,
-									GeometricTransform &gt);                                        
-		
-		/*virtual void generateGridFromOctree(const unsigned short &rl, 
-										TriMesh &input,
-										const string &name);*/
-		
-		virtual void generateGridMesh(TriMesh &input);
-		
-		virtual void linkElementsToNodes();
+   public:
+      Mesher();
+      virtual ~Mesher();
+      virtual FEMesh generateMesh(void * pClientData, TriMesh &input,
+                                  const unsigned short &rl, const string &name,
+                                  list<RefinementRegion *> &all_reg,
+                                  string table_name);
 
-		virtual void detectInsideNodes(TriMesh &input);
+   protected:
+      virtual void generateOctreeMesh(const unsigned short &rl, TriMesh &input,
+                                      list<RefinementRegion *> &all_reg,
+                                      const string &name);
 
-		virtual void removeOnSurface();
-		
-		virtual void applySurfacePatterns(TriMesh &input);
+      virtual bool isItIn(TriMesh &mesh, list<unsigned long> &faces, vector<Point3D> &coords);
 
-		virtual void shrinkToBoundary(TriMesh &input);
+      virtual bool rotateGridMesh(TriMesh &input,
+                                  list<RefinementRegion *> &all_reg,
+                                  GeometricTransform &gt);
 
-		virtual void saveOutputMesh(FEMesh &mesh);
-		
-		virtual void saveOutputMesh(FEMesh &mesh,
-									vector<MeshPoint> &points, 
-									list<Octant> &elements);
-        
-        virtual void projectCloseToBoundaryNodes(TriMesh &input);
+      /*virtual void generateGridFromOctree(const unsigned short &rl,
+                                          TriMesh &input,
+                                          const string &name);*/
 
+      virtual void generateGridMesh(TriMesh &input);
+      virtual void linkElementsToNodes();
+      virtual void detectInsideNodes(TriMesh &input);
+      virtual void removeOnSurface();
+      virtual void applySurfacePatterns(TriMesh &input);
+      virtual void shrinkToBoundary(TriMesh &input);
+      virtual void saveOutputMesh(FEMesh &mesh);
+      virtual void saveOutputMesh(FEMesh &mesh,
+                                  vector<MeshPoint> &points,
+                                  list<Octant> &elements);
+      virtual void projectCloseToBoundaryNodes(TriMesh &input);
 
-		
-	protected:
-		
-		vector<MeshPoint> points;
-		vector<Octant> octants;
-		set<OctreeEdge> octreeEdges;
-		list<RefinementRegion *> regions;
-
-		vector<Point3D> puntosVector;
-		vector<unsigned long> idxsVector;
-		set<unsigned long> idxsRefinados;
-	};
-	
-	
+   protected:
+      vector<MeshPoint> points;
+      vector<Octant> octants;
+      set<OctreeEdge> octreeEdges;
+      list<RefinementRegion *> regions;
+      vector<Point3D> puntosVector;
+      vector<unsigned long> idxsVector;
+      set<unsigned long> idxsRefinados;
+      string assoc_table_name;
+   };
 }
 #endif

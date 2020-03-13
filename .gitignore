@@ -1,4 +1,5 @@
 /build/
+/out/
 
 # vim
 *.un~
@@ -82,3 +83,6 @@ _deps
 .project
 .cproject
 .directory
+
+# Visual Studio
+.vs/

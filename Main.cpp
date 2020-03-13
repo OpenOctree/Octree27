@@ -26,7 +26,7 @@ using Clobscode::Point3D;
 //-------------------------------------------------------------------
 
 void endMsg(){
-	cout << "use: ./mesher [-i] input.mdl [-o] output [-s] ref_level [-a] ref_level [-r] file.reg [-u] input_surface rl\n";
+	cout << "use: ./mesher [-i] input.mdl [-o] output [-s] ref_level [-a] ref_level [-r] file.reg [-u] input_surface rl [-t table_name]\n";
 	cout << "where:\n";
 	cout << "  input.mdl is the surface input mesh in mdl format\n";
 	cout << "  output is the output mesh to be saved in output.m3d\n";
@@ -36,6 +36,7 @@ void endMsg(){
 	cout << "    -r (refine regions) and file.reg is a text file specifying ";
     cout << "       regions of refinement with a particular level\n";
     cout << "    -u (refine surface region) will refine all the elements in the input_surface at level rl\n";
+    cout << "    -t table_all|table_t7t5|ito2009_a|ito2009_b|ito_2009_c|table_t7|table_t6b|table_t5|table_t4c|table_t4b\n";
 }
 
 //-------------------------------------------------------------------
@@ -222,144 +223,134 @@ unsigned short readRefinementRegions(string name, list<RefinementRegion *> &regi
 //-------------------------------------------------------------------
 
 int main(int argc,char** argv){
-	
-    if (argc<4) {
-        endMsg();
-        return 0;
-    }
-    
-	const int n_meshes = 1;
-	string in_name, out_name = "";
-	bool out_name_given = false, in_name_given = false;
-	bool edge_projection = false;
-	
-	unsigned short ref_level = 0, rl = 0;
-	list<RefinementRegion *> all_regions;
-    RefinementRegion *rr;
+   if (argc<4) {
+      endMsg();
+      return 0;
+   }
 
-    vector<double> bounds;
-    Point3D pmin,pmax;
-    
-    vector<Clobscode::TriMesh> inputs;
-    inputs.reserve(1);
-    Clobscode::CoteMarek marek;
-    
-    //the firs parameter must be the input domain to mesh
-    
-    //there must be an input mesh
-	if (argv[1][0]=='-' && argv[1][1]=='i') {
-        
-        in_name = argv[2];
+   const int n_meshes = 1;
+   string in_name, out_name = "";
+   string table_name = "table_all";
+   bool out_name_given = false, in_name_given = false;
+   bool edge_projection = false;
 
-        for (unsigned long i=1; i<(n_meshes+1); i++) {
-            if (!marek.ReadInputMesh(in_name,inputs)) {
-                std::cerr << "couldn't read file " << argv[i] << std::endl;
-                return 1;
+   unsigned short ref_level = 0, rl = 0;
+   list<RefinementRegion *> all_regions;
+   RefinementRegion *rr;
+
+   vector<double> bounds;
+   Point3D pmin,pmax;
+
+   vector<Clobscode::TriMesh> inputs;
+   inputs.reserve(1);
+   Clobscode::CoteMarek marek;
+
+   //the firs parameter must be the input domain to mesh
+   //there must be an input mesh
+   if (argv[1][0]=='-' && argv[1][1]=='i') {
+      in_name = argv[2];
+      for (unsigned long i=1; i<(n_meshes+1); i++) {
+         if (!marek.ReadInputMesh(in_name,inputs)) {
+            std::cerr << "couldn't read file " << argv[i] << std::endl;
+            return 1;
+         }
+      }
+   }
+   else {
+      cout << "Error: first parameter must be the input domain to mesh\n";
+      endMsg();
+      return 0;
+   }
+
+   for (unsigned long i=3; i<argc; i++) {
+      if (argv[i][0]!='-') {
+         cout << "Error: expected option -X and got " << argv[i] << "\n";
+         endMsg();
+         return 0;
+      }
+      if (argc==i+1) {
+         cout << "Error: expected argument for option " << argv[i] << "\n";
+         endMsg();
+         return 0;
+      }
+
+      switch (argv[i][1]) {
+         case 'o':
+            out_name = argv[i+1];
+            out_name_given = true;
+            i++;
+            break;
+         case 'a':
+            rl = atoi(argv[i+1]);
+            if (ref_level<rl) {
+               ref_level = rl;
             }
-        }
-	}
-    else {
-        cout << "Error: first parameter must be the input domain to mesh\n";
-		endMsg();
-		return 0;
-    }
-    
-	for (unsigned long i=3; i<argc; i++) {
-        
-		if (argv[i][0]!='-') {
-			cout << "Error: expected option -X and got " << argv[i] << "\n";
-			endMsg();
-			return 0;
-		}
-		if (argc==i+1) {
-			cout << "Error: expected argument for option " << argv[i] << "\n";
-			endMsg();
-			return 0;
-		}
-        
-        switch (argv[i][1]) {
-            case 'o':
-                out_name = argv[i+1];
-                out_name_given = true;
-                i++;
-                break;
-            case 'a':
-                rl = atoi(argv[i+1]);
-                if (ref_level<rl) {
-                    ref_level = rl;
-                }
-                //+-10 is an arbitrary number to ensure the Bbox contains
-                //the entire input mesh
-                rr = new RefinementAllRegion(rl);
-                
-                //see if force rotation enable
-                if (argv[i][2]=='r') {
-                    rr->forceInputRotation();
-                }
-                
-                all_regions.push_back(rr);
-                i++;
-                break;
-            case 's':
-                rl = atoi(argv[i+1]);
-                if (ref_level<rl) {
-                    ref_level = rl;
-                }
-                rr = new RefinementInputSurfaceRegion(rl);
-                
-                //see if force rotation enable
-                if (argv[i][2]=='r') {
-                    rr->forceInputRotation();
-                }
-                
-                all_regions.push_back(rr);
-                i++;
-                break;
-            case 'r':
-                unsigned short max_reg;
-                max_reg= readRefinementRegions(argv[i+1],all_regions);
-                if (ref_level<max_reg) {
-                    ref_level = max_reg;
-                }
-                i++;
-                break;
-            case 'u':
-                rl = atoi(argv[i+2]);
-                readSurfaceRefinementRegion(argv[i+1],all_regions,rl);
-                if (ref_level<rl) {
-                    ref_level = rl;
-                }
-                i+=2;
-                break;
-            default:
-                cerr << "Warning: unknown option " << argv[i] << " skipping\n";
-                break;
-        }
-    }
-	
-	//give default output name if non is provided
-	if (!out_name_given) {
-		unsigned long last_point = in_name.find_last_of(".");
-		out_name = in_name.substr(0,last_point);
-	}
-	
-    auto start_time = chrono::high_resolution_clock::now();
-	
-    //Generate the mesh following the above constraints.
-	Clobscode::Mesher mesher;
-	Clobscode::FEMesh output = mesher.generateMesh(&marek,inputs[0],ref_level,out_name,
-												   all_regions);
-	marek.WriteOutputMesh(out_name,output);
+            //+-10 is an arbitrary number to ensure the Bbox contains
+            //the entire input mesh
+            rr = new RefinementAllRegion(rl);
+            //see if force rotation enable
+            if (argv[i][2]=='r') {
+               rr->forceInputRotation();
+            }
+            all_regions.push_back(rr);
+            i++;
+            break;
+         case 's':
+            rl = atoi(argv[i+1]);
+            if (ref_level<rl) {
+               ref_level = rl;
+            }
+            rr = new RefinementInputSurfaceRegion(rl);
+            //see if force rotation enable
+            if (argv[i][2]=='r') {
+               rr->forceInputRotation();
+            }
+            all_regions.push_back(rr);
+            i++;
+            break;
+         case 'r':
+            unsigned short max_reg;
+            max_reg= readRefinementRegions(argv[i+1],all_regions);
+            if (ref_level<max_reg) {
+               ref_level = max_reg;
+            }
+            i++;
+            break;
+         case 'u':
+            rl = atoi(argv[i+2]);
+            readSurfaceRefinementRegion(argv[i+1],all_regions,rl);
+            if (ref_level<rl) {
+               ref_level = rl;
+            }
+            i+=2;
+            break;
+         case 't':
+            table_name = argv[i+1];
+            i++;
+            break;
+         default:
+            cerr << "Warning: unknown option " << argv[i] << " skipping\n";
+            break;
+      }
+   }
+   //give default output name if non is provided
+   if (!out_name_given) {
+      unsigned long last_point = in_name.find_last_of(".");
+      out_name = in_name.substr(0,last_point);
+   }
+   auto start_time = chrono::high_resolution_clock::now();
+   //Generate the mesh following the above constraints.
+   Clobscode::Mesher mesher;
+   Clobscode::FEMesh output = mesher.generateMesh(&marek,inputs[0],ref_level,out_name,all_regions,table_name);
+   marek.WriteOutputMesh(out_name,output);
 
-    auto end_time = chrono::high_resolution_clock::now();
-    cout << "  All done in " << chrono::duration_cast<chrono::milliseconds>(end_time-start_time).count();
-    cout << " ms"<< endl;
-	
-    list<RefinementRegion *>::iterator rriter;
-    for (rriter = all_regions.begin(); rriter!=all_regions.end(); rriter++) {
-        delete *rriter;
-    }
-    
-	return 0;
+   auto end_time = chrono::high_resolution_clock::now();
+   cout << "  All done in " << chrono::duration_cast<chrono::milliseconds>(end_time-start_time).count();
+   cout << " ms"<< endl;
+
+   list<RefinementRegion *>::iterator rriter;
+   for (rriter = all_regions.begin(); rriter!=all_regions.end(); rriter++) {
+      delete *rriter;
+   }
+   return 0;
 }
-
