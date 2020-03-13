@@ -23,7 +23,7 @@ namespace patterns {
    // T4B  = 5
    // T4C  = 6
    // T4Cb = 7
-   // T5A  = 8
+   // T5   = 8
    // T6   = 9
    // T6B  = 10
    // T7   = 11
@@ -48,8 +48,8 @@ namespace patterns {
       {139, 6},    // 4C --> T4C  [ 0 1 3 7 ]
       // T4C.b
       {29, 7},     // 4Cb--> T4Cb [ 0 2 3 4 ]
-      // T5A
-      {31, 8},     // 5A --> T5A  [ 0 1 2 3 4 ]
+      // T5
+      {31, 8},     // 5A --> T5   [ 0 1 2 3 4 ]
       // T6
       {93, 9},     // 5B --> T6   [ 0 3 2 4 6 ]
       {221, 9},    // 6A --> T6   [ 0 3 2 4 7 6 ]
@@ -61,6 +61,36 @@ namespace patterns {
       {173, 12},   // 5C --> T8   [ 0 3 2 5 7 ]
       {235, 12},   // 6C --> T8   [ 0 1 3 5 7 6 ]
       {255, 12},   //  8 --> T8   [ 0 1 2 3 4 5 6 7 ]
+   };
+
+   /// Table from ito et. al (2009) efficient...
+   const map<Uint, Uint> PatternFactory::pattern_template_map_T7T5 = {
+      // None: 1, 2B, 2C, 3C, 4F
+      // T2
+      {9, 1},      // 2A --> T2   [ 0 3 ]
+      {73, 1},     // 3B --> T2   [ 0 3 6 ]
+      // T3
+      {11, 2},     // 3A --> T3   [ 0 1 3 ]
+      {75, 2},     // 4D --> T3   [ 0 1 3 6 ]
+      // T4
+      {15, 3},     // 4A --> T4   [ 0 1 3 2 ]
+      // T40
+      {195, 4},    // 4E --> T40  [ 0 1 7 6 ]
+      // T5
+      {31, 8},     // 5A --> T5   [ 0 1 2 3 4 ]
+      // T6
+      {141, 9},    // 4B --> T6   [ 0 2 3 7 ]
+      {77, 9},     // 4C --> T6   [ 0 2 3 6 ]
+      {29, 9},     // 4Cb--> T6   [ 0 2 3 4 ]
+      {93, 9},     // 5B --> T6   [ 0 3 2 4 6 ]
+      {221, 9},    // 6A --> T6   [ 0 3 2 4 7 6 ]
+      // T7
+      {191, 11},   //  7 --> T7   [ 0 1 2 3 4 5 7 ]
+      // T8
+      {173, 12},   // 5C --> T8   [ 0 3 2 5 7 ]
+      {95, 12},    // 6B --> T8   [ 0 1 2 3 4 6 ]
+      {235, 12},   // 6C --> T8   [ 0 1 3 5 7 6 ]
+      {255, 12}    //  8 --> T8   [ 0 1 2 3 4 5 6 7 ]
    };
 
    /// Table from ito et. al (2009) efficient...
@@ -206,7 +236,7 @@ namespace patterns {
    };
 
    /// Table ito_C + T5A
-   const map<Uint, Uint> PatternFactory::pattern_template_map_T5A = {
+   const map<Uint, Uint> PatternFactory::pattern_template_map_T5 = {
       // None: 1, 2B, 2C, 3C, 4F
       // T2
       {9, 1},      // 2A --> T2   [ 0 3 ]
@@ -218,8 +248,8 @@ namespace patterns {
       {15, 3},     // 4A --> T4   [ 0 1 3 2 ]
       // T40
       {195, 4},    // 4E --> T40  [ 0 1 7 6 ]
-      // T5A
-      {31, 8},     // 5A --> T5A  [ 0 1 2 3 4 ]
+      // T5
+      {31, 8},     // 5A --> T5   [ 0 1 2 3 4 ]
       // T6
       {141, 9},    // 4B --> T6   [ 0 2 3 7 ]
       {77, 9},     // 4C --> T6   [ 0 2 3 6 ]
@@ -576,7 +606,7 @@ namespace patterns {
             {HEXA_POINTS, {47, 45, 185, 187, 7, 4, 60, 62}}
         }
       },
-      { // T5A
+      { // T5
          8, {
             //Centro
             {HEXA_POINTS, {56, 57, 59, 58, 60, 61, 63, 62}},
@@ -926,7 +956,7 @@ namespace patterns {
          {0, 3, 10, 11},
          {0, 4, 24, 25},
          {3, 2, 14, 15}}},
-      // T5A  [ 0 1 2 3 4 ]
+      // T5   [ 0 1 2 3 4 ]
       {8, {
          {0, 1, 8, 9},
          {0, 3, 10, 11},
@@ -1053,6 +1083,10 @@ namespace patterns {
          pattern_template_map = &pattern_template_map_newest;
          return;
       }
+      if ("table_t7t5" == table_name){
+         pattern_template_map = &pattern_template_map_T7T5;
+         return;
+      }
       if ("ito2009_c" == table_name){
          pattern_template_map = &pattern_template_map_ito_C;
          return;
@@ -1073,8 +1107,8 @@ namespace patterns {
          pattern_template_map = &pattern_template_map_T6B;
          return;
       }
-      if ("table_t5a" == table_name){
-         pattern_template_map = &pattern_template_map_T5A;
+      if ("table_t5" == table_name){
+         pattern_template_map = &pattern_template_map_T5;
          return;
       }
       if ("table_t4c" == table_name){
@@ -1085,6 +1119,7 @@ namespace patterns {
          pattern_template_map = &pattern_template_map_T4B;
          return;
       }
+      cout << "ERROR, Table name not recognized: " << table_name << endl;
    }
 
    void PatternFactory::deleteInstance () {

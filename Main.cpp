@@ -36,7 +36,7 @@ void endMsg(){
 	cout << "    -r (refine regions) and file.reg is a text file specifying ";
     cout << "       regions of refinement with a particular level\n";
     cout << "    -u (refine surface region) will refine all the elements in the input_surface at level rl\n";
-    cout << "    -t table_all|ito2009_a|ito2009_b|ito_2009_c|table_t7|table_t6b|table_t5a|table_t4c|table_t4b\n";
+    cout << "    -t table_all|table_t7t5|ito2009_a|ito2009_b|ito_2009_c|table_t7|table_t6b|table_t5|table_t4c|table_t4b\n";
 }
 
 //-------------------------------------------------------------------
